@@ -1,6 +1,6 @@
-﻿namespace ChatApp.Controllers
+﻿namespace ChatApp.Web.Controllers
 {
-    using ChatApp.Models;
+    using ChatApp.Web.Models;
     using Microsoft.AspNetCore.Mvc;
     using System.Diagnostics;
 

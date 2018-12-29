@@ -1,4 +1,4 @@
-﻿@using ChatApp.Views.Manage
+﻿@using ChatApp.Web.Views.Manage
 @inject SignInManager<User> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();

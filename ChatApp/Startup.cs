@@ -1,9 +1,9 @@
 ﻿namespace ChatApp
 {
     using ChatApp.Data;
-    using ChatApp.Hubs;
-    using ChatApp.Models;
-    using ChatApp.Services;
+    using ChatApp.Data.Models;
+    using ChatApp.Web.Hubs;
+    using ChatApp.Web.Services;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;

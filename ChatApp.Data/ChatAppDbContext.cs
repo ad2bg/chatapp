@@ -1,6 +1,6 @@
 ﻿namespace ChatApp.Data
 {
-    using ChatApp.Models;
+    using ChatApp.Data.Models;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 

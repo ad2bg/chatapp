@@ -1,8 +1,8 @@
-﻿namespace ChatApp.Controllers
+﻿namespace ChatApp.Web.Controllers
 {
-    using ChatApp.Models;
-    using ChatApp.Models.AccountViewModels;
-    using ChatApp.Services;
+    using ChatApp.Data.Models;
+    using ChatApp.Web.Models.AccountViewModels;
+    using ChatApp.Web.Services;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;

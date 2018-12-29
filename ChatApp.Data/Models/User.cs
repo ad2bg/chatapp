@@ -1,4 +1,4 @@
-﻿namespace ChatApp.Models
+﻿namespace ChatApp.Data.Models
 {
     using Microsoft.AspNetCore.Identity;
 

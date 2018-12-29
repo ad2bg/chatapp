@@ -1,6 +1,6 @@
 namespace Microsoft.AspNetCore.Mvc
 {
-    using ChatApp.Controllers;
+    using ChatApp.Web.Controllers;
 
     public static class UrlHelperExtensions
     {

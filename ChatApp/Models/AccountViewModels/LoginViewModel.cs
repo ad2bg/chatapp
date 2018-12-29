@@ -1,4 +1,4 @@
-﻿namespace ChatApp.Models.AccountViewModels
+﻿namespace ChatApp.Web.Models.AccountViewModels
 {
     using System.ComponentModel.DataAnnotations;
 

@@ -1,4 +1,4 @@
-﻿namespace ChatApp.Hubs
+﻿namespace ChatApp.Web.Hubs
 {
     using Microsoft.AspNetCore.SignalR;
     using System.Threading.Tasks;

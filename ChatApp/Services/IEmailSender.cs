@@ -1,4 +1,4 @@
-﻿namespace ChatApp.Services
+﻿namespace ChatApp.Web.Services
 {
     using System.Threading.Tasks;
 

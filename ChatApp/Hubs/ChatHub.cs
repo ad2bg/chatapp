@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
-
-namespace ChatApp.Hubs
+﻿namespace ChatApp.Hubs
 {
+    using Microsoft.AspNetCore.SignalR;
+    using System.Threading.Tasks;
+
     public class ChatHub : Hub
     {
         public async Task SendMessage(string user, string message)

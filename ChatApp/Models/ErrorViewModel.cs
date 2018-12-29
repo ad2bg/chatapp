@@ -1,5 +1,3 @@
-using System;
-
 namespace ChatApp.Models
 {
     public class ErrorViewModel

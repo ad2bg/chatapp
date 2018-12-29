@@ -24,14 +24,14 @@
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ChatAppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // Set password strength requirements in development mode 
             // see also the passwords MinLength settings in the views
             if (this.Env.IsDevelopment())
             {
-                services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                services.AddIdentity<User, IdentityRole>(options =>
                 {
                     options.Password.RequiredLength = 1;
                     options.Password.RequireDigit = false;
@@ -39,12 +39,12 @@
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
                 })
-                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddEntityFrameworkStores<ChatAppDbContext>()
                     .AddDefaultTokenProviders();
             }
             else
             {
-                services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                services.AddIdentity<User, IdentityRole>(options =>
                 {
                     options.Password.RequiredLength = 6;
                     options.Password.RequireDigit = true;
@@ -52,7 +52,7 @@
                     options.Password.RequireNonAlphanumeric = true;
                     options.Password.RequireUppercase = true;
                 })
-                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddEntityFrameworkStores<ChatAppDbContext>()
                     .AddDefaultTokenProviders();
             }
 

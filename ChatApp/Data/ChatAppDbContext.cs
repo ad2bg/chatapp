@@ -4,9 +4,9 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ChatAppDbContext : IdentityDbContext<User>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ChatAppDbContext(DbContextOptions<ChatAppDbContext> options)
             : base(options)
         {
         }

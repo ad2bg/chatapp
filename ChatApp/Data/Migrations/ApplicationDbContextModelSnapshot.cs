@@ -6,7 +6,7 @@
     using System;
 
 
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(ChatAppDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -122,7 +122,7 @@
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ChatApp.Models.ApplicationUser", b =>
+            modelBuilder.Entity("ChatApp.Models.User", b =>
                 {
                     b.Property<string>("Id");
 
@@ -181,7 +181,7 @@
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ChatApp.Models.ApplicationUser")
+                    b.HasOne("ChatApp.Models.User")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -189,7 +189,7 @@
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ChatApp.Models.ApplicationUser")
+                    b.HasOne("ChatApp.Models.User")
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -202,7 +202,7 @@
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ChatApp.Models.ApplicationUser")
+                    b.HasOne("ChatApp.Models.User")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

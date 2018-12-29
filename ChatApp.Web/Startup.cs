@@ -1,4 +1,4 @@
-﻿namespace ChatApp
+﻿namespace ChatApp.Web
 {
     using ChatApp.Data;
     using ChatApp.Data.Models;

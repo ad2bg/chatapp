@@ -1,4 +1,4 @@
-﻿namespace ChatApp
+﻿namespace ChatApp.Web
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;

@@ -5,6 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20181229203058_MessagesAndRooms.cs" />
+    <Compile Remove="Migrations\20181229205220_TrySolveMessageSenderIssue.cs" />
+    <Compile Remove="Migrations\20181229210018_TrySolveMessageSenderIssueAttempt2.cs" />
+    <Compile Remove="Migrations\20181229210233_TrySolveMessageSenderIssueAttempt3.cs" />
+    <Compile Remove="Migrations\20181229211231_TrySolveMessageSenderIssueAttempt4.cs" />
+    <Compile Remove="Migrations\20181229211740_TrySolveMessageSenderIssueAttempt5.cs" />
+    <Compile Remove="Migrations\20181229212609_TrySolveMessageSenderIssueAttempt6.cs" />
+    <Compile Remove="Migrations\20181229214115_TrySolveMessageSenderIssueAttempt7.cs" />
+    <Compile Remove="Migrations\20181229214617_TrySolveMessageSenderIssueAttempt8.cs" />
+    <Compile Remove="Migrations\20181229220344_TrySolveMessageSenderIssueAttempt9.cs" />
+    <Compile Remove="Migrations\20181229220549_TrySolveMessageSenderIssueAttempt10.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
   </ItemGroup>

@@ -123,7 +123,7 @@
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ChatApp.Models.User", b =>
+            modelBuilder.Entity("ChatApp.Data.Models.User", b =>
                 {
                     b.Property<string>("Id");
 
@@ -182,7 +182,7 @@
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ChatApp.Models.User")
+                    b.HasOne("ChatApp.Data.Models.User")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -190,7 +190,7 @@
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ChatApp.Models.User")
+                    b.HasOne("ChatApp.Data.Models.User")
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -203,7 +203,7 @@
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ChatApp.Models.User")
+                    b.HasOne("ChatApp.Data.Models.User")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

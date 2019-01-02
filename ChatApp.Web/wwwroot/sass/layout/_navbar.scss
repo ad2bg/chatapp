@@ -1,0 +1,40 @@
+/*Hide the right navbar button on narrow screens*/
+@media all and (max-width: 350px) {
+  #navbar-toggle-left {
+    display: none;
+  }
+
+  .navbar-brand {
+    margin-left: 0;
+  }
+}
+
+/*Drop the dropdowns on hover*/
+.dropdown:hover {
+  cursor: pointer;
+  > .dropdown-menu {
+    display: block;
+  }
+}
+
+/*dropdowns sticky behaviour*/
+.dropdown > .dropdown-toggle:active {
+  /*Without this, clicking will make it sticky*/
+  /*pointer-events: none;*/
+}
+
+/*Navbar links hover background*/
+.navbar a:hover {
+  /*background-color: rgb(0, 0, 0); !* for light on dark *!*/
+  background-color: rgba(0, 0, 0, 0.1); /* for dark on light */
+}
+
+/*Custom colors for the navbar toggle buttons*/
+/*Comment these out when using the defaults (light or dark) navbar*/
+.custom-toggler.navbar-toggler {
+  border-color: rgb(255, 102, 203);
+}
+/*Notice the rgba setting*/
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,102,203, 0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}

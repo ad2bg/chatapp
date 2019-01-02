@@ -1,0 +1,46 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+}
+
+
+/*Hide bullet points on list items in divs with this class*/
+.list-style-none li, li {
+  list-style: none;
+}
+
+/* .user-photo */
+.user-photo {
+  transition: all .2s ease-in-out;
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+/* .hover-scale */
+.hover-scale {
+  transition: all .5s ease-in-out;
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+//
+//body#body-enlarge-image > div.container-fluid:first-of-type {
+//  border: 1px solid red;
+//  min-height: 100%;
+//}
+
+
+.tooltip-inner {
+  max-width: 100% !important;
+}

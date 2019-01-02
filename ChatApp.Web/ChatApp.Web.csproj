@@ -5,6 +5,13 @@
     <UserSecretsId>aspnet-ChatApp-CC2911DE-9A43-4382-A834-1918AC2A80BB</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="wwwroot\css\pages\**" />
+    <Content Remove="wwwroot\css\pages\**" />
+    <EmbeddedResource Remove="wwwroot\css\pages\**" />
+    <None Remove="wwwroot\css\pages\**" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
@@ -18,6 +25,16 @@
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.2" />
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
+    <None Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\additional-methods.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\additional-methods.min.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+    <None Include="wwwroot\lib\jquery-validation\LICENSE.md" />
   </ItemGroup>
 
   <ItemGroup>

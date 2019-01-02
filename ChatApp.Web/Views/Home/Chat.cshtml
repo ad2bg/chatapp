@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewData["Title"] = "Chat";
+}
+
+<h1>@ViewData["title"]</h1>
+
+
+<div class="container">
+
+    <div class="row">
+        <div class="col">
+            <label>Message <input type="text" id="messageInput" /></label>
+            <label>To Room <input type="text" id="toRoomInput" /></label>
+            <label>To User <input type="text" id="toUserInput" /></label>
+            <button onclick="sendMessage()">Send</button>
+            <hr />
+            <label>Room <input type="text" id="roomInput" /></label>
+            <button onclick="joinRoom()">Join</button>
+            <button onclick="leaveRoom()">Leave</button>
+
+        </div>
+    </div>
+
+    <div class="row"><div class="col"><hr /></div></div>
+
+    <div class="row">
+        <div class="col">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+
+</div>

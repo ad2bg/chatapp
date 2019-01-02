@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{const string title = "Chat App";}
+@{const string navbarBgColor = "dark";}
+@{const string navbarFgColor = "light";}
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,63 +10,150 @@
     <title>@ViewData["Title"] - ChatApp</title>
 
     <environment include="Development">
+
+        @* Bootstrap *@
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+
+        @* Font Awesome *@
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+              integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+              crossorigin="anonymous"
+              asp-fallback-href="~/lib/font-awesome/all.css">
+
+        @* Site CSS *@
         <link rel="stylesheet" href="~/css/site.css" />
+
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+
+        @* Bootstrap *@
+        <link rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+              asp-fallback-test-class="sr-only"
+              asp-fallback-test-property="position"
+              asp-fallback-test-value="absolute" />
+
+        @* Font Awesome *@
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+              integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+              crossorigin="anonymous"
+              asp-fallback-href="~/lib/font-awesome/all.css">
+
+        @* Site CSS *@
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
     </environment>
 </head>
+
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">ChatApp</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+
+    <header class="mb-3">
+
+        <nav class="navbar fixed-top navbar-expand-md navbar-@navbarBgColor bg-@navbarBgColor p-0">
+
+            @* LEFT *@
+            @* Button-Left *@
+            <button id="navbar-toggle-left" class="custom-toggler navbar-toggler m-2" type="button"
+                    data-toggle="collapse" data-target=".dual-collapse2">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link text-@navbarFgColor p-3"
+                           data-toggle="tooltip" title=""
+                           asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a asp-area="" asp-controller="Home" asp-action="About" class="nav-link text-@navbarFgColor p-3"><i class="fas fa-info"></i> About</a>
+                    </li>
+                    <li class="nav-item">
+                    <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link text-@navbarFgColor p-3"><i class="fas fa-file-signature"></i> Contact</a>
+                    </li>
+
                 </ul>
-                @await Html.PartialAsync("_LoginPartial")
             </div>
-        </div>
-    </nav>
+
+
+            @* CENTER *@
+            <div class="order-0">
+                <a class="navbar-brand mx-auto text-@navbarFgColor p-3"
+                   data-toggle="tooltip"
+                   data-container="body"
+                   title="<strong class='display-1'>Welcome!</strong><br /><span class='display-4 text-primary'>...</span>"
+                   asp-area="" asp-controller="Home" asp-action="Index">
+                    @title.ToUpper()
+                </a>
+            </div>
+
+
+
+            @* RIGHT *@
+            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                <ul class="navbar-nav ml-auto">
+                    @await Html.PartialAsync("_LoginPartial", new LoginPartialViewModel(navbarBgColor, navbarFgColor))
+                </ul>
+            </div>
+
+
+            @* Button-Right *@
+            <button id="navbar-toggle-rigth" class="custom-toggler navbar-toggler m-2" type="button"
+                    data-toggle="collapse" data-target=".dual-collapse2">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+        </nav>
+
+        @*Take the space underneath the header when it is setup as fixed; TODO: Comment out otherwise!*@
+        <div class="py-4">&nbsp;</div>
+
+    </header>
+
+
+
+    @* BODY *@
     <div class="container body-content">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; 2018 - ChatApp</p>
-        </footer>
     </div>
+
+
+
+    @* FOOTER *@
+    @*Take the space underneath the footer when it is setup as fixed; TODO: Comment out otherwise!*@
+    <div class="py-4">&nbsp;</div>
+    <footer id="main-footer"
+            class="footer container-fluid fixed-bottom
+            bg-@navbarBgColor text-@navbarFgColor">
+        <div class="container text-center">
+            <p>&copy; @DateTime.Now.Year - @title</p>
+        </div>
+    </footer>
+
 
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        <script src="~/lib/signalr/dist/browser/signalr.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/chat.js"></script>
     </environment>
     <environment exclude="Development">
-        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+        @* jQuery *@
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
                 asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
                 asp-fallback-test="window.jQuery"
                 crossorigin="anonymous"
-                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
         </script>
-        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
-                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                crossorigin="anonymous"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        @* Bootstrap Bundle includes Popper! *@
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
         </script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>

@@ -62,6 +62,15 @@
 
             services.AddMvc();
 
+            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+            {
+                builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithOrigins("http://localhost:60455/")
+                    .AllowCredentials();
+            }));
+
             services.AddSignalR();
         }
 
@@ -81,6 +90,10 @@
             app.UseStaticFiles();
 
             app.UseAuthentication();
+
+
+            app.UseCookiePolicy();
+            app.UseCors("CorsPolicy");
 
             // add SignalR as middleware
             app.UseSignalR(routes =>

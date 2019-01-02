@@ -1,13 +1,38 @@
-﻿"use strict";
+﻿'use strict';
 
+// server-side methods
+const sendPublicMessage = 'SendPublicMessage';
+const sendMessageToGroup = 'SendMessageToGroup';
+const sendPrivateMessage = 'SendPrivateMessage';
+const hubJoinRoom = 'JoinRoom';
+const hubLeaveRoom = 'LeaveRoom';
+
+// Client-side methods
+const userOnline = "userOnline";
+const userOffline = "userOffline";
+const receiveMessage = "receiveMessage";
+
+
+// UI elements
+const messageInput = $('#messageInput');
+const toRoomInput = $('#toRoomInput');
+const toUserInput = $('#toUserInput');
+const roomInput = $('#roomInput');
+const messagesList = $('#messagesList');
+const usersList = messagesList;
+
+
+// set connection
+// LogLevel: Error=> errors only; Warning=> W+Errors; Information=>I+W+E; Trace=> everything, incl. the data
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/chatHub")
-    .configureLogging(signalR.LogLevel.Information) // Error=> errors only; Warning=> W+Errors; Information=>I+W+E; Trace=> everything, incl. the data
+    .withUrl('/chatHub')
+    .configureLogging(signalR.LogLevel.Information)
     .build();
 
+// start the connection (and restart it as necessary)
 connection
     .start()
-    .catch((err) => console.error(err.toString()));
+    .catch(err => console.error(err.toString()));
 
 connection.onclose(async () => { await start(); });
 
@@ -21,33 +46,86 @@ async function start() {
         console.log(`${now.toUTCString}\n${err}`);
         setTimeout(() => start(), 5000);
     }
-};
+}
 
 
-// receive a message
-connection.on("ReceiveMessage", (user, message) => {
 
-    const msg = escapeHtml(message);
-
-    const encodedMsg = user + " says " + msg;
-    const li = document.createElement("li");
-    li.textContent = encodedMsg;
-    document.getElementById("messagesList").appendChild(li);
+// user online
+connection.on(userOnline, username => {
+    const li = $('<li>');
+    const now = new Date();
+    li.text(username + ' joined at ' + now.toLocaleTimeString());
+    usersList.append(li);
 });
 
-document.getElementById("sendButton")
-    .addEventListener("click", (event) => {
+// user offline
+connection.on(userOffline, username => {
+    const li = $('<li>');
+    const now = new Date();
+    li.text(username + ' left at ' + now.toLocaleTimeString());
+    usersList.append(li);
+});
 
-        event.preventDefault();
 
-        const user = document.getElementById("userInput").value;
-        const message = document.getElementById("messageInput").value;
 
+// SEND MESSAGE
+function sendMessage() {
+    const message = messageInput.val();
+    const toRoomName = toRoomInput.val().trim();
+    const toUserName = toUserInput.val().trim();
+    messageInput.val('');
+    toRoomInput.val('');
+    toUserInput.val('');
+
+
+    if (toUserName) {
+        // to user
         connection
-            .invoke("SendMessage", user, message) // invoking the Hub's SendMessage method
+            .invoke(sendPrivateMessage, toUserName, message)
             .catch(err => console.error(err.toString()));
+    }
+    else if (toRoomName) {
+        // to room
+        connection
+            .invoke(sendMessageToGroup, toRoomName, message)
+            .catch(err => console.error(err.toString()));
+    }
+    else {
+        // public
+        connection
+            .invoke(sendPublicMessage, message)
+            .catch(err => console.error(err.toString()));
+    }
+}
 
-    });
+// RECEIVE MESSAGE
+connection.on(receiveMessage, (user, message) => {
+    const li = $('<li>');
+    li.text(`${user}: ${escapeHtml(message)}`);
+    messagesList.append(li);
+});
 
+function escapeHtml(unsafeText) {
+    return unsafeText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
-function escapeHtml(unsafe) {    return unsafe        .replace(/&/g, "&amp;")        .replace(/</g, "&lt;")        .replace(/>/g, "&gt;")        .replace(/"/g, "&quot;")        .replace(/'/g, "&#039;");}
+// JOIN ROOM
+function joinRoom() {
+    const roomName = roomInput.val().trim();
+    connection
+        .invoke(hubJoinRoom, roomName)
+        .catch(err => console.error(err.toString()));
+}
+
+// LEAVE ROOM
+function leaveRoom() {
+    const roomName = roomInput.val().trim();
+    connection
+        .invoke(hubLeaveRoom, roomName)
+        .catch(err => console.error(err.toString()));
+}

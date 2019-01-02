@@ -1,15 +1,19 @@
 {
-  "name": "ChatApp",
+  "name": "chat-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple chat application in ASP.NET Core 2.0, SignalR and React.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch-sass": "node-sass ./ChatApp.web/wwwroot/sass/main.scss ./ChatApp.web/wwwroot/css/site.css --watch"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Aleksandar Dimitrov",
+  "license": "MIT",
   "dependencies": {
     "@aspnet/signalr": "^1.1.0"
+  },
+  "devDependencies": {
+    "node-sass": "^4.11.0"
   }
 }

@@ -3,10 +3,12 @@
     using ChatApp.Data;
     using ChatApp.Data.Models;
     using ChatApp.Web.Hubs;
+    using ChatApp.Web.Infrastructure.Extensions;
     using ChatApp.Web.Services;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -59,8 +61,12 @@
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddDomainServices();
 
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+            });
 
             services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
             {
@@ -76,6 +82,8 @@
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseDatabaseMigrations();
+
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();

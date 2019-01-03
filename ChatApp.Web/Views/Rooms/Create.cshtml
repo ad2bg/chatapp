@@ -1,0 +1,27 @@
+﻿@model RoomCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Room";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post">
+
+    @* NAME *@
+    <div class="form-group">
+        <label asp-for="RoomName"></label>
+        <input asp-for="RoomName" required class="form-control">
+        <span asp-validation-for="RoomName" class="form-text text-danger"></span>
+    </div>
+
+    @* SUBMIT BUTTON *@
+    <div class="form-group">
+        <input class="btn btn-success" type="submit" value="Create Room">
+    </div>
+
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -5,7 +5,12 @@
     public class RegisterViewModel
     {
         [Required]
-        [EmailAddress]
+        [StringLength(20, MinimumLength = 1, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.")]
+        [RegularExpression("[A-Za-z]+", ErrorMessage = "Username must have only letters.")]
+        public string Username { get; set; }
+        
+        [Required]
+        [EmailAddress(ErrorMessage = "This is not a valid email address.")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 

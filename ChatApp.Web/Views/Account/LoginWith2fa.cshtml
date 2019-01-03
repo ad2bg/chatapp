@@ -6,16 +6,23 @@
 <h2>@ViewData["Title"]</h2>
 <hr />
 <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
+
 <div class="row">
     <div class="col-md-4">
         <form method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+
             <input asp-for="RememberMe" type="hidden" />
-            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* TWO FACTOR CODE *@
             <div class="form-group">
                 <label asp-for="TwoFactorCode"></label>
                 <input asp-for="TwoFactorCode" class="form-control" autocomplete="off" />
                 <span asp-validation-for="TwoFactorCode" class="text-danger"></span>
             </div>
+
+            @* REMEMBER MACHINE *@
             <div class="form-group">
                 <div class="checkbox">
                     <label asp-for="RememberMachine">
@@ -24,9 +31,12 @@
                     </label>
                 </div>
             </div>
+
+            @* SUBMIT BUTTON *@
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Log in</button>
             </div>
+
         </form>
     </div>
 </div>

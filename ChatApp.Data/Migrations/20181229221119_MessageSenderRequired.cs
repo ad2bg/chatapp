@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-
-namespace ChatApp.Data.Migrations
+﻿namespace ChatApp.Data.Migrations
 {
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     public partial class MessageSenderRequired : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

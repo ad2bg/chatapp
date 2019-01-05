@@ -118,6 +118,13 @@
 
     @* BODY *@
     <div class="container body-content">
+
+        <noscript>
+            <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
+        </noscript>
+
+        <div id="root"><!-- This div's content will be managed by React. --></div>
+
         @RenderBody()
     </div>
 

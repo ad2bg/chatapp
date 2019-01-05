@@ -3,6 +3,7 @@
     using ChatApp.Data;
     using ChatApp.Data.Models;
     using ChatApp.Web.Hubs;
+    using ChatApp.Web.Infrastructure;
     using ChatApp.Web.Infrastructure.Extensions;
     using ChatApp.Web.Services;
     using Microsoft.AspNetCore.Builder;
@@ -12,6 +13,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    //using Microsoft.AspNetCore.Owin;
 
     public class Startup
     {
@@ -73,7 +75,7 @@
                 builder
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .WithOrigins("http://localhost:60455/")
+                    .WithOrigins(GlobalConstants.Domain)
                     .AllowCredentials();
             }));
 

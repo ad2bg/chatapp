@@ -1,10 +1,12 @@
 ﻿namespace ChatApp.Web.Hubs
 {
+    using ChatApp.Web.Infrastructure.Filters;
     using Microsoft.AspNetCore.SignalR;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    [MeasureTime]
     public class ChatHub : Hub
     {
         const string you = "You";
@@ -15,19 +17,19 @@
         const string receiveMessage = "receiveMessage";
 
 
-        private static Dictionary<string, string> users = new Dictionary<string, string>();
+        private static Dictionary<string, string> connectionIds = new Dictionary<string, string>();
 
 
-        // ADD TO USERS
-        private void AddToUsers(string username)
+        // ADD TO CONNECTION IDs DICT
+        private void AddToConnectionIds(string username)
         {
-            users[username] = Context.ConnectionId;
+            connectionIds[username] = Context.ConnectionId;
         }
 
-        // REMOVE FROM USERS
-        private void RemoveFromUsers(string username)
+        // REMOVE FROM CONNECTION IDs DICT
+        private void RemoveFromConnectionIds(string username)
         {
-            users.Remove(username);
+            connectionIds.Remove(username);
         }
 
         // ONLINE
@@ -37,7 +39,7 @@
             string username = Context.User.Identity.Name;
             if (username != null)
             {
-                AddToUsers(username);
+                AddToConnectionIds(username);
                 Clients.Caller.SendAsync(userOnline, you);
                 Clients.Others.SendAsync(userOnline, username);
             }
@@ -50,7 +52,7 @@
             string username = Context.User.Identity.Name;
             if (username != null)
             {
-                RemoveFromUsers(username);
+                RemoveFromConnectionIds(username);
                 Clients.All.SendAsync(userOffline, username);
             }
             return base.OnDisconnectedAsync(exception);
@@ -83,12 +85,22 @@
         public async Task SendPrivateMessage(string user, string message)
         {
             string username = Context.User.Identity.Name; // sender
-            if (username != null && users.ContainsKey(user))
+            if (username != null && connectionIds.ContainsKey(user))
             {
-                await Clients.Client(users[user]).SendAsync(receiveMessage, username, message);
+                await Clients.Client(connectionIds[user]).SendAsync(receiveMessage, username, message);
             }
         }
 
+
+        // CREATE ROOM
+        public async Task CreateRoom(string groupName)
+        {
+            string connectionId = Context.ConnectionId;
+            string username = Context.User.Identity.Name;
+            await Groups.AddToGroupAsync(connectionId, groupName);
+            await Clients.Caller.SendAsync(receiveMessage, you, $"{you} created room {groupName}.");
+            await Clients.Others.SendAsync(receiveMessage, username, $"{username} created room {groupName}.");
+        }
 
         // JOIN ROOM
         public async Task JoinRoom(string groupName)
@@ -96,7 +108,7 @@
             string connectionId = Context.ConnectionId;
             string username = Context.User.Identity.Name;
             await Groups.AddToGroupAsync(connectionId, groupName);
-            await Clients.Group(groupName).SendAsync(receiveMessage, username, $"{username} has joined the group {groupName}.");
+            await Clients.Group(groupName).SendAsync(receiveMessage, username, $"{username} joined room {groupName}.");
         }
 
         // LEAVE ROOM
@@ -105,7 +117,7 @@
             string connectionId = Context.ConnectionId;
             string username = Context.User.Identity.Name;
             await Groups.RemoveFromGroupAsync(connectionId, groupName);
-            await Clients.Group(groupName).SendAsync(receiveMessage, username, $"{username} has left the group {groupName}.");
+            await Clients.Group(groupName).SendAsync(receiveMessage, username, $"{username} left room {groupName}.");
         }
     }
 }

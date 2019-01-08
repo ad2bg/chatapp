@@ -1,5 +1,6 @@
 ﻿namespace ChatApp.Web
 {
+    using AutoMapper;
     using ChatApp.Data;
     using ChatApp.Data.Models;
     using ChatApp.Web.Hubs;
@@ -25,6 +26,9 @@
             Configuration = configuration;
             this.Env = env;
         }
+
+
+
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -61,9 +65,43 @@
             }
 
 
+            // FACEBOOK
+            services.AddAuthentication().AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                facebookOptions.Events.OnRemoteFailure = (context) =>
+                {
+                    context.Response.Redirect("/account/login");
+                    context.HandleResponse();
+                    return System.Threading.Tasks.Task.FromResult(0);
+                };
+            });
+
+            // GOOGLE
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+            });
+
+            // MICROSOFT
+            services.AddAuthentication().AddMicrosoftAccount(microsoftOptions =>
+            {
+                microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ApplicationId"];
+                microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:Password"];
+            });
+
+
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddDomainServices();
+
+
+            // Add AutoMapper   (depends on AutoMapper.Extensions.Microsoft.DependencyInjection)
+            services.AddAutoMapper();
+
+
 
             services.AddMvc(options =>
             {
@@ -81,6 +119,10 @@
 
             services.AddSignalR();
         }
+
+
+
+        // CONFIGURE
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {

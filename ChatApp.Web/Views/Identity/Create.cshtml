@@ -1,17 +1,18 @@
-﻿@model RegisterViewModel
+﻿@model CreateUserViewModel
+
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create User";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <div class="row">
-    <div class="col-md-6 offset-md-3">
-        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-            <h4>Create a new account.</h4>
+    <div class="col-md-4">
+        <form method="post">
             <hr />
 
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
 
             @* USERNAME *@
             <div class="form-group">
@@ -19,13 +20,15 @@
                 <input asp-for="Username" class="form-control" />
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
-            
-            @* USERNAME *@
+
+
+            @* EMAIL *@
             <div class="form-group">
                 <label asp-for="Email"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
+
 
             @* PASSWORD *@
             <div class="form-group">
@@ -34,6 +37,7 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
+
             @* CONFIRM PASSWORD *@
             <div class="form-group">
                 <label asp-for="ConfirmPassword"></label>
@@ -41,9 +45,9 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
 
-            @* SUBMIT *@
-            <button type="submit" class="btn btn-primary">Register</button>
 
+            @* SUBMIT BUTTON *@
+            <button type="submit" class="btn btn-primary">Create User</button>
         </form>
     </div>
 </div>

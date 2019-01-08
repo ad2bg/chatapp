@@ -1,6 +1,7 @@
 ﻿namespace ChatApp.Web.Controllers
 {
     using ChatApp.Data.Models;
+    using ChatApp.Services;
     using ChatApp.Web.Models.AccountViewModels;
     using ChatApp.Web.Services;
     using Microsoft.AspNetCore.Authentication;
@@ -20,22 +21,26 @@
         private readonly SignInManager<User> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly IUserService _userService;
 
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger, IUserService userService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _userService = userService;
         }
 
         [TempData]
         public string ErrorMessage { get; set; }
 
+
+        // LOGIN
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)

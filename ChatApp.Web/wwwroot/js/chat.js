@@ -7,7 +7,7 @@ const sendPrivateMessage = 'SendPrivateMessage';
 const hubJoinRoom = 'JoinRoom';
 const hubLeaveRoom = 'LeaveRoom';
 
-// Client-side methods
+// client-side methods
 const userOnline = "userOnline";
 const userOffline = "userOffline";
 const receiveMessage = "receiveMessage";
@@ -92,6 +92,7 @@ function sendMessage() {
     }
     else {
         // public
+        console.log(message);
         connection
             .invoke(sendPublicMessage, message)
             .catch(err => console.error(err.toString()));
@@ -106,6 +107,7 @@ connection.on(receiveMessage, (user, message) => {
 });
 
 function escapeHtml(unsafeText) {
+    //return unsafeText;
     return unsafeText
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')

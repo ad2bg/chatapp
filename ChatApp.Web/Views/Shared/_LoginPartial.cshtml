@@ -1,73 +1,63 @@
-@using Microsoft.AspNetCore.Identity
-@using ChatApp.Data.Models
+@using ChatApp.Web.Infrastructure
+@*@using Microsoft.AspNetCore.Identity
+    @using ChatApp.Data.Models
+    @inject SignInManager<User> SignInManager
+    @inject UserManager<User> UserManager*@
 
 @model LoginPartialViewModel
 
-@inject SignInManager<User> SignInManager
-@inject UserManager<User> UserManager
 
-
-
-@if (SignInManager.IsSignedIn(User))
+@if (User.Identity.IsAuthenticated)
 {
-
-
-    @*<li class="nav-item">
-            <a class="nav-link text-{{ navbarFgColor }} p-3"
-               data-toggle="tooltip" title="Add Article"
-               href="{{ path('article_create',{'goBack':currentUri}) }}">
-                <i class="fas fa-plus"></i>
-            </a>
-        </li>
-
-        {#Admin Dropdown#}
-            {% if app.user.isAdmin() %}
-            {% include 'partials/site-header-dropdown-admin.html.twig' %}
-            {% endif %}
-
-            {#User Dropdown#}
-            {% include 'partials/site-header-dropdown-user.html.twig' %}*@
-
-
-
     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
+
+            @* CHAT *@
             <li>
-                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage Your Profile"
-                   class="nav-link text-@Model.NavbarFgColor p-3"><i class="far fa-user-circle"></i> Hello @(UserManager.GetUserName(User))!</a>
+                <a asp-area="" asp-controller="Home" asp-action="Chat" class="nav-link text-@Model.NavbarFgColor p-3">
+                    <i class="far fa-comments"></i> Chat
+                </a>
             </li>
 
+            @* ADMIN *@
+            @if (User.IsInRole(GlobalConstants.AdministratorRole))
+            {
+                <li class="nav-item">
+                    <a class="nav-link text-@Model.NavbarFgColor p-3"
+                       data-toggle="tooltip" title="Admin"
+                       asp-area="" asp-controller="Identity" asp-action="All">
+                        <i class="fas fa-tools"></i>
+                    </a>
+                </li>
+            }
+
+            @* USER PROFILE *@
             <li>
-                <a asp-area="" asp-controller="Home" asp-action="Chat"
-                   class="nav-link text-@Model.NavbarFgColor p-3"><i class="far fa-comments"></i> Chat</a>
+                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage Your Profile" class="nav-link text-@Model.NavbarFgColor p-3">
+                    <i class="far fa-user-circle"></i>Hello @User.Identity.Name!
+                </a>
             </li>
 
+            @* LOGOUT *@
             <li>
-                <button type="submit" class="nav-link btn bg-@Model.NavbarBgColor text-@Model.NavbarFgColor p-3"><i class="fas fa-sign-out-alt"></i> Log out</button>
+                <button type="submit" class="nav-link btn bg-@Model.NavbarBgColor text-@Model.NavbarFgColor p-3"
+                        data-toggle="tooltip" title="Log out">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </li>
         </ul>
     </form>
 }
 else
 {
-
-
-    @*<li class="nav-item">
-            <a class="nav-link bg-{{ navbarBgColor }} text-{{ navbarFgColor }} p-3"
-               href="{{ path('user_register', {'goBack':currentUri}) }}">REGISTER</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link bg-{{ navbarBgColor }} text-{{ navbarFgColor }} p-3"
-               href="{{ path('security_login') }}">LOGIN</a>
-        </li>*@
     <ul class="nav navbar-nav navbar-right">
         <li>
             <a asp-area="" asp-controller="Account" asp-action="Register"
-               class="nav-link text-@Model.NavbarFgColor p-3"><i class="fas fa-user-plus"></i> Register</a>
+               class="nav-link text-@Model.NavbarFgColor p-3"><i class="fas fa-user-plus"></i>Register</a>
         </li>
         <li>
             <a asp-area="" asp-controller="Account" asp-action="Login"
-               class="nav-link text-@Model.NavbarFgColor p-3"><i class="fas fa-sign-in-alt"></i> Log in</a>
+               class="nav-link text-@Model.NavbarFgColor p-3"><i class="fas fa-sign-in-alt"></i>Log in</a>
         </li>
     </ul>
 }

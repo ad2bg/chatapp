@@ -1,9 +1,11 @@
 ﻿namespace ChatApp.Web.Controllers
 {
+    using ChatApp.Web.Infrastructure.Filters;
     using ChatApp.Web.Models;
     using Microsoft.AspNetCore.Mvc;
     using System.Diagnostics;
 
+    [Log]
     public class HomeController : Controller
     {
         public IActionResult Index() => View();

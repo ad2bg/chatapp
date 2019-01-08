@@ -1,28 +1,28 @@
-﻿namespace ChatApp.Web.Models.AccountViewModels
+﻿namespace ChatApp.Web.Models.IdentityViewModels
 {
     using ChatApp.Web.Infrastructure;
     using System.ComponentModel.DataAnnotations;
 
-    public class RegisterViewModel
+    public class CreateUserViewModel
     {
+
         [Required]
         [StringLength(
-            maximumLength: GlobalConstants.UserUsernameMaxLength,
-            MinimumLength = GlobalConstants.UserUsernameMinLength,
-            ErrorMessage = GlobalConstants.StringLengthErrorMessage)]
-        [RegularExpression("[A-Za-z]+", ErrorMessage = "Username must have only letters.")]
+            maximumLength:GlobalConstants.UserUsernameMaxLength,
+            ErrorMessage = GlobalConstants.StringLengthErrorMessage, 
+            MinimumLength = GlobalConstants.UserUsernameMinLength)]
         public string Username { get; set; }
 
         [Required]
-        [EmailAddress(ErrorMessage = "This is not a valid email address.")]
+        [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
         [StringLength(
             maximumLength:GlobalConstants.UserPasswordMaxLength,
-            MinimumLength = GlobalConstants.UserPasswordMinLength,
-            ErrorMessage = GlobalConstants.StringLengthErrorMessage)]
+            ErrorMessage = GlobalConstants.StringLengthErrorMessage, 
+            MinimumLength = GlobalConstants.UserPasswordMinLength)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -32,5 +32,6 @@
         [Compare("Password", 
             ErrorMessage = GlobalConstants.PasswordsDontMatchErrorMessage)]
         public string ConfirmPassword { get; set; }
+
     }
 }

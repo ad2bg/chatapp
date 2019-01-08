@@ -5,15 +5,13 @@
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using System.Threading.Tasks;
 
     public static class ApplicationBuilderExtensions
     {
 
-
-        // Migrate database; This is called from the Startup.cs file
+        // Migrate database; This is used in Startup.cs
         public static IApplicationBuilder UseDatabaseMigrations(this IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -22,9 +20,9 @@
 
                 SeedAdminInAdminRole(serviceScope);
             }
-
             return app;
         }
+
 
         private static void SeedAdminInAdminRole(IServiceScope serviceScope)
         {

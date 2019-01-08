@@ -2,6 +2,7 @@
 {
     using ChatApp.Data.Models;
     using ChatApp.Services;
+    using ChatApp.Web.Infrastructure.Filters;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@
     using System.Threading.Tasks;
 
     [Authorize]
+    [Log]
     [Route("[controller]/[action]")]
     public class RoomsController : Controller
     {
@@ -57,7 +59,10 @@
             try
             {
                 var user = await this.userManager.GetUserAsync(User);
-                if (user == null) { return NotFound(); }
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
                 this.roomService.Create(roomName, user);
 

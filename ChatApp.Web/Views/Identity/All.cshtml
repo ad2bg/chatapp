@@ -1,0 +1,42 @@
+﻿@model IEnumerable<ListUserViewModel>
+@{
+    ViewData["Title"] = "All Users";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+
+
+<div>
+    <a asp-action="Create" class="btn btn-primary">Add User</a>
+</div>
+<br />
+
+@* TABLE *@
+<table class="table table-bordered table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>UserName</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <th>@user.UserName</th>
+            <th>@user.Email</th>
+            <th>
+                <a asp-action="Roles" asp-route-id="@user.Id" class="btn btn-primary" title="Roles">
+                    <i class="fas fa-users-cog"></i>
+                </a>
+                <a asp-action="ChangePassword" asp-route-id="@user.Id" class="btn btn-warning" title="Change Password">
+                    <i class="fas fa-key"></i>
+                </a>
+                <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger" title="Delete">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+            </th>
+        </tr>
+    }
+</table>

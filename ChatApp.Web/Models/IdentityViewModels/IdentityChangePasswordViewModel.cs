@@ -1,20 +1,19 @@
-﻿namespace ChatApp.Web.Models.AccountViewModels
+﻿namespace ChatApp.Web.Models.IdentityViewModels
 {
     using ChatApp.Web.Infrastructure;
     using System.ComponentModel.DataAnnotations;
-   
-    public class ResetPasswordViewModel
+
+    public class IdentityChangePasswordViewModel
     {
-        [Required]
-        [EmailAddress]
         public string Email { get; set; }
 
         [Required]
         [StringLength(
-            maximumLength:GlobalConstants.UserPasswordMaxLength, 
-            MinimumLength = GlobalConstants.UserPasswordMinLength,
-            ErrorMessage = GlobalConstants.StringLengthErrorMessage)]
+            maximumLength: GlobalConstants.UserPasswordMaxLength, 
+            ErrorMessage = GlobalConstants.StringLengthErrorMessage, 
+            MinimumLength = GlobalConstants.UserPasswordMinLength)]
         [DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
@@ -22,7 +21,5 @@
         [Compare("Password", 
             ErrorMessage = GlobalConstants.PasswordsDontMatchErrorMessage)]
         public string ConfirmPassword { get; set; }
-
-        public string Code { get; set; }
     }
 }

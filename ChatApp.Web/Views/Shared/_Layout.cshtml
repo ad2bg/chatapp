@@ -2,6 +2,8 @@
 @{const string navbarBgColor = "dark";}
 @{const string navbarFgColor = "light";}
 
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,7 +48,7 @@
     </environment>
 </head>
 
-<body>
+<body class="h-100">
 
     <header class="mb-3">
 
@@ -61,19 +63,32 @@
 
             <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
                 <ul class="navbar-nav mr-auto">
+
+                    @* HOME *@
                     <li class="nav-item active">
                         <a class="nav-link text-@navbarFgColor p-3"
-                           data-toggle="tooltip" title=""
+                           data-toggle="tooltip" title="Home"
                            asp-area="" asp-controller="Home" asp-action="Index">
-                            <i class="fas fa-home"></i> Home
+                            <i class="fas fa-home"></i>
                         </a>
                     </li>
 
+                    @* ABOUT *@
                     <li class="nav-item">
-                    <a asp-area="" asp-controller="Home" asp-action="About" class="nav-link text-@navbarFgColor p-3"><i class="fas fa-info"></i> About</a>
+                        <a asp-area="" asp-controller="Home" asp-action="About"
+                           data-toggle="tooltip" title="About"
+                           class="nav-link text-@navbarFgColor p-3">
+                            <i class="fas fa-info"></i>
+                        </a>
                     </li>
+
+
                     <li class="nav-item">
-                    <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link text-@navbarFgColor p-3"><i class="fas fa-file-signature"></i> Contact</a>
+                        <a asp-area="" asp-controller="Home" asp-action="Contact"
+                           data-toggle="tooltip" title="Contact"
+                           class="nav-link text-@navbarFgColor p-3">
+                            <i class="fas fa-file-signature"></i>
+                        </a>
                     </li>
 
                 </ul>
@@ -96,7 +111,7 @@
             @* RIGHT *@
             <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
                 <ul class="navbar-nav ml-auto">
-                    @await Html.PartialAsync("_LoginPartial", new LoginPartialViewModel(navbarBgColor, navbarFgColor))
+                    @await Html.PartialAsync("_LoginPartial", new LoginPartialViewModel(navbarBgColor: navbarBgColor, navbarFgColor: navbarFgColor))
                 </ul>
             </div>
 
@@ -114,17 +129,36 @@
 
     </header>
 
+    @* NO SCRIPT *@
+    <noscript>
+        <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
+    </noscript>
+
+
+    @* MESSAGES *@
+    <div class="px-1">
+
+        @if (TempData[GlobalConstants.SuccessMessage] != null)
+        {
+            <h3 class="alert alert-success alert-dismissible text-center shadow fade show my-1">
+                @TempData[GlobalConstants.SuccessMessage]
+                @Html.Partial("_AlertCloseButton")
+            </h3>
+        }
+
+        @if (TempData[GlobalConstants.ErrorMessage] != null)
+        {
+            <h3 class="alert alert-danger alert-dismissible text-center shadow fade show my-1">
+                @TempData[GlobalConstants.ErrorMessage]
+                @Html.Partial("_AlertCloseButton")
+            </h3>
+        }
+    </div>
+
 
 
     @* BODY *@
-    <div class="container body-content">
-
-        <noscript>
-            <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
-        </noscript>
-
-        <div id="root"><!-- This div's content will be managed by React. --></div>
-
+    <div class="container-fluid body-content h-100">
         @RenderBody()
     </div>
 
@@ -141,15 +175,32 @@
         </div>
     </footer>
 
-
+    @* DEVELOPMENT *@
     <environment include="Development">
+
+        @* jQuery *@
         <script src="~/lib/jquery/dist/jquery.js"></script>
+        @* Bootstrap Bundle includes Popper! *@
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+
+        @* SignalR *@
         <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+
+        @* Babel *@
+        <script src="https://unpkg.com/babel-standalone@6/babel.js"></script>
+
+        @* React *@
+        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+        @* Site Custom JS *@
         <script src="~/js/site.js" asp-append-version="true"></script>
-        <script src="~/js/chat.js"></script>
+
     </environment>
+
+    @* PRODUCTION *@
     <environment exclude="Development">
+
         @* jQuery *@
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"
                 asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
@@ -162,8 +213,27 @@
                 asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
                 asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
         </script>
+
+        @* SignalR *@
+        <script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
+
+        @* Babel *@
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+        @* React *@
+        <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+
+        @* Site Custom JS *@
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
+
+    @* React *@
+    <script type="text/babel" src="~/js/src/react.js">
+    </script>
+
+    @* SignalR Chat Client *@
+    @*<script src="~/js/chat.js"></script>*@
 
     @RenderSection("Scripts", required: false)
 </body>

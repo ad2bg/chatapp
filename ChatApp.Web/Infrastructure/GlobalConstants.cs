@@ -5,7 +5,10 @@
         public const string Domain = "http://localhost:55555/";
         public const string AdministratorRole = "Administrator";
         public const string AdministratorEmail = "admin@mysite.com";
+        public const string PublicRoomName = "Public";
         public const string LogFilename = "log.txt";
+        public const string LogMeasureTimeFilename = "action-times.txt";
+        public const string LogDateTimeFormat = "yyyy/MM/dd hh:mm:ss.fff";
         public const string SuccessMessage = "SuccessMessage";
         public const string ErrorMessage = "ErrorMessage";
         public const string StringLengthErrorMessage = "The {0} must be at least {2} and at max {1} characters long.";

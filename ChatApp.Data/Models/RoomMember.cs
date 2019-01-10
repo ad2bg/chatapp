@@ -11,14 +11,5 @@
         public string MemberId { get; set; }
 
         public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
-
-        //public RoomMember(Room room, User member)
-        //{
-        //    this.Room = room;
-        //    //this.RoomId = room.Id;
-        //    this.Member = member;
-        //    //this.MemberId = member.Id;
-        //    //this.JoinedAt = DateTime.UtcNow;
-        //}
     }
 }

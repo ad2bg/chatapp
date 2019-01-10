@@ -28,8 +28,6 @@
         }
 
 
-
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ChatAppDbContext>(options =>
@@ -123,7 +121,6 @@
 
 
         // CONFIGURE
-
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseDatabaseMigrations();

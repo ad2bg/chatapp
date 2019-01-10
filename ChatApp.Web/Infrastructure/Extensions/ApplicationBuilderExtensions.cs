@@ -30,10 +30,9 @@
             var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
             Task.Run(async () =>
             {
+                // create Admin role
                 var adminRoleName = GlobalConstants.AdministratorRole;
-
                 var roleExists = await roleManager.RoleExistsAsync(adminRoleName);
-
                 if (!roleExists)
                 {
                     var result = await roleManager.CreateAsync(new IdentityRole
@@ -42,8 +41,8 @@
                     });
                 }
 
+                // create Admin and assign Admin role
                 var adminEmail = GlobalConstants.AdministratorEmail;
-
                 var adminUser = await userManager.FindByNameAsync(adminEmail);
                 if (adminUser == null)
                 {
@@ -55,7 +54,10 @@
 
                     string adminPassword = "admin12";
                     var result = await userManager.CreateAsync(adminUser, adminPassword);
-                    if (result == IdentityResult.Success) await userManager.AddToRoleAsync(adminUser, adminRoleName);
+                    if (result == IdentityResult.Success)
+                    {
+                        await userManager.AddToRoleAsync(adminUser, adminRoleName);
+                    }
                 }
             })
             .Wait();

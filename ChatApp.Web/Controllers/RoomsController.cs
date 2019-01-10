@@ -64,7 +64,7 @@
                     return NotFound();
                 }
 
-                this.roomService.Create(roomName, user);
+                this.roomService.CreateAsync(roomName, user);
 
                 return RedirectToAction(nameof(Index));
             }

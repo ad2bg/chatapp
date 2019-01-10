@@ -2,7 +2,11 @@
 {
     using ChatApp.Data;
     using ChatApp.Data.Models;
+    using Microsoft.EntityFrameworkCore;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     public class MessageService : IMessageService
     {
@@ -14,8 +18,18 @@
             this.db = db;
         }
 
-        // CREATE
-        public void Create(string text, User sender, User recipient = null, Room room = null)
+
+        // ALL IN ROOM ASYNC
+        public async Task<IEnumerable<Message>> AllInRoomAsync(string groupName)
+        {
+            return await this.db.Messages
+                .Where(m => m.Room.Name == groupName)
+                .OrderBy(m => m.TimeSent)
+                .ToListAsync();
+        }
+
+        // CREATE ASYNC
+        public async Task CreateAsync(string text, User sender, User recipient = null, Room room = null)
         {
             var message = new Message
             {
@@ -42,7 +56,7 @@
                 room.ReceivedMessages.Add(message);
             }
 
-            this.db.SaveChanges();
+            await this.db.SaveChangesAsync();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@{const string title = "Chat App";}
+﻿@{const string title = "Just Chat";}
 @{const string navbarBgColor = "dark";}
 @{const string navbarFgColor = "light";}
 
@@ -187,7 +187,9 @@
         <script src="~/lib/signalr/dist/browser/signalr.js"></script>
 
         @* Babel *@
-        <script src="https://unpkg.com/babel-standalone@6/babel.js"></script>
+        @*<script src="https://unpkg.com/babel-standalone@6/babel.js"></script>*@
+        @*<script src="~/lib/babel/babel.js"></script>*@
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
 
         @* React *@
         <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
@@ -229,11 +231,7 @@
     </environment>
 
     @* React *@
-    <script type="text/babel" src="~/js/src/react.js">
-    </script>
-
-    @* SignalR Chat Client *@
-    @*<script src="~/js/chat.js"></script>*@
+    <script type="text/babel" src="~/js/src/react.js"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

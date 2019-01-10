@@ -22,7 +22,7 @@
             base.OnModelCreating(builder);
 
 
-            // Message >- Sender
+            // Message >-- Sender
             builder
                 .Entity<Message>()
                 .HasOne(m => m.Sender)
@@ -31,7 +31,7 @@
                 .OnDelete(DeleteBehavior.Restrict);
 
 
-            // Message >- Recipient
+            // Message >-- Recipient
             builder
                 .Entity<Message>()
                 .HasOne(m => m.Recipient)
@@ -39,7 +39,7 @@
                 .HasForeignKey(m => m.RecipientId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Message >- Room
+            // Message >-- Room
             builder
                 .Entity<Message>()
                 .HasOne(m => m.Room)
@@ -48,7 +48,7 @@
                 .OnDelete(DeleteBehavior.Restrict);
 
 
-            // Room >- Owner
+            // Room >-- Owner
             builder
                 .Entity<Room>()
                 .HasOne(r => r.Owner)
@@ -64,13 +64,13 @@
             builder
                 .Entity<RoomMember>()
                 .HasOne(rm => rm.Room)
-                .WithMany(r => r.Members)
+                .WithMany(r => r.RoomMembers)
                 .HasForeignKey(rm => rm.RoomId)
                 .OnDelete(DeleteBehavior.Restrict);
             builder
                 .Entity<RoomMember>()
                 .HasOne(rm => rm.Member)
-                .WithMany(u => u.RoomsMemberOf)
+                .WithMany(u => u.RoomMembers)
                 .HasForeignKey(p => p.MemberId)
                 .OnDelete(DeleteBehavior.Restrict);
 

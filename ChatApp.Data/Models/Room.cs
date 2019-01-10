@@ -12,19 +12,16 @@
         [MaxLength(200)]
         public string Name { get; set; }
 
-
-        [Required]
         public User Owner { get; set; }
 
-        [Required]
         public string OwnerId { get; set; }
 
 
-        // Room -< Message
+        // Room --< Message
         public List<Message> ReceivedMessages { get; set; } = new List<Message>();
 
         // Room >-< Member
-        public List<RoomMember> Members { get; set; } = new List<RoomMember>();
+        public List<RoomMember> RoomMembers { get; set; } = new List<RoomMember>();
 
     }
 }

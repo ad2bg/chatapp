@@ -1,4 +1,4 @@
-﻿namespace ChatApp.Web.Infrastructure.Mapping
+﻿namespace ChatApp.Services.Infrastructure.Mapping
 {
     public interface IHaveCustomMapping
     {

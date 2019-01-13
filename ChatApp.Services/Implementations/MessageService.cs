@@ -28,8 +28,21 @@
                 .ToListAsync();
         }
 
+
+        // ALL WITH USER ASYNC
+        public async Task<IEnumerable<Message>> AllWithUserAsync(string myId, string userId)
+        {
+            return await this.db.Messages
+                .Where(m =>
+                    (m.Sender.Id == myId && m.Recipient.Id == userId) ||
+                    (m.Sender.Id == userId && m.Recipient.Id == myId)
+                )
+                .OrderBy(m => m.TimeSent)
+                .ToListAsync();
+        }
+
         // CREATE ASYNC
-        public async Task CreateAsync(string text, User sender, User recipient = null, Room room = null)
+        public async Task<Message> CreateAsync(string text, User sender, User recipient = null, Room room = null)
         {
             var message = new Message
             {
@@ -57,6 +70,8 @@
             }
 
             await this.db.SaveChangesAsync();
+
+            return message;
         }
     }
 }

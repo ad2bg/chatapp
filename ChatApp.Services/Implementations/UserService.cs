@@ -2,6 +2,7 @@
 {
     using ChatApp.Data;
     using ChatApp.Data.Models;
+    using Microsoft.EntityFrameworkCore;
     using System.Linq;
 
     public class UserService : IUserService
@@ -21,6 +22,16 @@
             this.db.Users
             .Where(u => u.Id == id)
             .FirstOrDefault();
+
+
+        // BY USERNAME
+        public User ByUsername(string username) =>
+            this.db.Users
+            .Where(u => u.UserName == username)
+            .Include(u => u.RoomMembers)
+            .ThenInclude(rm => rm.Room)
+            .FirstOrDefault();
+
 
         // UPDATE
         public void Update(string id)

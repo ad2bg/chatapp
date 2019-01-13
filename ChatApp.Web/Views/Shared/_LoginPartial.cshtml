@@ -12,13 +12,6 @@
     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
 
-            @* CHAT *@
-            <li>
-                <a asp-area="" asp-controller="Home" asp-action="Chat" class="nav-link text-@Model.NavbarFgColor p-3">
-                    <i class="far fa-comments"></i> Chat
-                </a>
-            </li>
-
             @* ADMIN *@
             @if (User.IsInRole(GlobalConstants.AdministratorRole))
             {

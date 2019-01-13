@@ -15,6 +15,7 @@ const chatApp = (() => {
         hubOpenRoom: 'OpenRoom',
         hubJoinRoom: 'JoinRoom',
         hubLeaveRoom: 'LeaveRoom',
+        hubOpenUser: 'OpenUser',
 
         // client-side methods
         getData: "getData",
@@ -29,13 +30,15 @@ const chatApp = (() => {
 
         // other constants
         publicRoom: 'Public',
-        you: 'You',
-        headersHeight: '2.9em',
-        listsHeight: '- 6.4em',
-        footersHeight: '3.5em',
-        shortTimeFormat: 'HH:NN',
+        formatTimeShort: 'HH:NN',
+        formatTimeLong: 'DD/MM/YYYY HH:NN:SS',
         formatDate: (dateObj, format = 'yyyy/mm/dd') => {
+
+            //console.log(dateObj);
+
             if (!dateObj || 'now' === dateObj) dateObj = new Date();
+
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
             function pad(n, width, z) {
                 z = z || '0';
@@ -55,25 +58,27 @@ const chatApp = (() => {
             day = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
 
             format = format.toLowerCase();
-            format = format.replace('yyyy', year)
-            format = format.replace('yy', year % 100)
-            format = format.replace('mm', pad(month, 2))
-            format = format.replace('m', month)
-            format = format.replace('wwww', day)
-            format = format.replace('www', day.substring(0, 3))
-            format = format.replace('ww', day.substring(0, 2))
-            format = format.replace('dd', pad(date, 2))
-            format = format.replace('d', date)
-            format = format.replace('hh', pad(hours, 2))
-            format = format.replace('h', hours)
-            format = format.replace('nn', pad(minutes, 2))
-            format = format.replace('n', minutes)
-            format = format.replace('ss', pad(seconds, 2))
-            format = format.replace('s', seconds)
-            format = format.replace('lll', pad(milliseconds, 3))
+            format = format.replace('yyyy', year);
+            format = format.replace('yy', year % 100);
+            format = format.replace('mmmm', months[month - 1]);
+            format = format.replace('mmm', months[month - 1].substr(0, 3));
+            format = format.replace('mm', pad(month, 2));
+            format = format.replace('m', month);
+            format = format.replace('wwww', day);
+            format = format.replace('www', day.substring(0, 3));
+            format = format.replace('ww', day.substring(0, 2));
+            format = format.replace('dd', pad(date, 2));
+            format = format.replace('d', date);
+            format = format.replace('hh', pad(hours, 2));
+            format = format.replace('h', hours);
+            format = format.replace('nn', pad(minutes, 2));
+            format = format.replace('n', minutes);
+            format = format.replace('ss', pad(seconds, 2));
+            format = format.replace('s', seconds);
+            format = format.replace('lll', pad(milliseconds, 3));
             return format;
         },
-        userCircleSize: 50
+        userCircleSize: 50,
     }
 });
 
@@ -87,7 +92,7 @@ class App extends React.Component {
     state = {
         connection: null, youAre: null,
         rooms: [], users: [], messages: [],
-        activeRoom: null, activeUser: null
+        activeRoom: null, activeUser: null, activePage: 'Rooms'
     }
 
     componentDidMount() {
@@ -127,7 +132,7 @@ class App extends React.Component {
         }
 
         this.connection.on(getData, () => this.getData());
-        this.connection.on(youAre, () => this.youAre());
+        this.connection.on(youAre, username => this.youAre(username));
         this.connection.on(userOnline, username => this.userOnline(username));
         this.connection.on(userOffline, username => this.userOffline(username));
         this.connection.on(receiveMessage, (user, messageText) => this.receiveMessage(user, messageText));
@@ -141,27 +146,36 @@ class App extends React.Component {
     // GET DATA
     getData = () => {
         this.connection.invoke(chatApp().hubGetData).catch(err => console.error(err.toString()));
-        if (!this.state.activeRoom && !this.state.activeUser) { this.openRoom(chatApp().publicRoom) }
+        if (!this.state.activeRoom && !this.state.activeUser) {
+            this.setState({ activePage: 'Rooms', activeRoom: chatApp().publicRoom });
+        }
     }
 
     // YOU ARE
     youAre = (username) => this.setState({ youAre: username });
 
+
     // NOTIFY
     notify = (message) => { alert(message); };
 
+    // SET PAGE
+    setPage = (page) => this.setState({ activePage: page });
 
 
     // REFRESH ROOMS
-    refreshRooms = (rooms) => this.setState({ rooms: rooms });
+    refreshRooms = (rooms) => {
+        const publicRoomName = chatApp().publicRoom;
+        const publicRoom = rooms.filter(r => r.name === publicRoomName)[0];
+        rooms = rooms.filter(r => r.name !== publicRoomName);
+        this.setState({ rooms: [publicRoom, ...rooms] });
+    }
 
     // CREATE ROOM
     createRoom = (roomName) => this.connection.invoke(chatApp().hubCreateRoom, roomName).catch(err => console.error(err.toString()));
 
     // OPEN ROOM
     openRoom = (roomName) => {
-        this.setState({ activeRoom: roomName });
-        this.setState({ activeUser: null });
+        this.setState({ activeRoom: roomName, activeUser: null, activePage: 'Chat' });
         this.connection.invoke(chatApp().hubOpenRoom, roomName).catch(err => console.error(err.toString()));
     }
 
@@ -174,60 +188,64 @@ class App extends React.Component {
 
 
     // REFRESH USERS
-    refreshUsers = (users) => {
-        //console.log(users);
-        this.setState({ users: users });
+    refreshUsers = (userModels) => {
+        console.log(userModels);
+        this.setState({ users: userModels.sort((a,b) => this.sortByUsername(a,b)) });
     }
+
 
     // SELECT USER
-    selectUser = (username) => {
-        //console.log(username);
-        this.setState({ activeRoom: null });
-        this.setState({ activeUser: username });
-    }
+    selectUser = (username) => this.setState({ activeRoom: null, activeUser: username, activePage: 'Chat' });
 
     // USER ONLINE
-    userOnline = (username) => {
-        const now = new Date();
-        const user = { username, joinedAt: now };
-        this.setState({
-            users: [...this.state.users,
-                //user
-            ]
-        });
+    userOnline = (userModel) => {
+        //console.log(userModel);
+        this.userOffline(userModel.username);
+        const userModels = [...this.state.users, userModel]
+            .sort((a, b) => this.sortByUsername(a, b));
+        this.setState({ users: userModels });
     }
+
 
     // USER OFFLINE
     userOffline = (username) => {
-        const { users } = this.state;
         this.setState({
-            users: users.filter(user => user.username !== username)
+            users: this.state.users
+                .filter(user => user.username !== username)
+                .sort((a, b) => this.sortByUsername(a,b))
         });
     }
 
 
+    sortByUsername = (a, b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0);
+
 
     // REFRESH MESSAGES
-    refreshMessages = (messages) => {
-        //console.log(messages);
-        this.setState({ messages: messages });
-    }
+    refreshMessages = (messageModels) => this.setState({ messages: messageModels });
 
     // SEND MESSAGE
-    sendMessage = (message) => {
+    sendMessage = (messageText) => {
 
-        // console.log(message);
         const { sendPublicMessage, sendMessageToGroup, sendPrivateMessage } = chatApp();
         const { activeRoom, activeUser } = this.state;
 
-        if (activeUser) { // to user
-            this.connection.invoke(sendPrivateMessage, activeUser, message).catch(err => console.error(err.toString()));
+        if (activeUser) { // private message to another user
+            console.log('sending to user: ' + activeUser);
+            this.connection.invoke(sendPrivateMessage, activeUser, messageText).catch(err => console.error(err.toString()));
         }
-        else if (activeRoom) { // to room
-            this.connection.invoke(sendMessageToGroup, activeRoom, message).catch(err => console.error(err.toString()));
+        else if (activeRoom) { // message to a given room
+            console.log('sending to room: ' + activeRoom);
+            this.connection.invoke(sendMessageToGroup, activeRoom, messageText).catch(err => console.error(err.toString()));
         }
-        else { // public
-            this.connection.invoke(sendPublicMessage, message).catch(err => console.error(err.toString()));
+        else {
+            // public;
+            // Note: This should never be executed with the current implementation,
+            // since we have the "Public" room. The Public room does not have an owner and can be joined by any user.
+            // The idea behind the fact that the users can leave the Public room, is that they may want to avoid "spam".
+            // On the server there is a corresponding "SendPublicMessage" method, just to illustrate how
+            // messages would be forwarded to the other users in case we didn't have a Public room.
+            console.log('sending publc: ' + messageText);
+            this.connection.invoke(sendPublicMessage, messageText).catch(err => console.error(err.toString()));
         }
 
         this.refs.messages
@@ -236,9 +254,16 @@ class App extends React.Component {
     }
 
     // RECEIVE MESSAGE
-    receiveMessage = (user, messageText) => {
-        messageText = this.escapeHtml(messageText);
-        this.setState({ messages: [...this.state.messages, { user: user, text: messageText }] })
+    receiveMessage = (messageModel) => {
+        const messageText = this.escapeHtml(messageModel.text);
+        this.setState({
+            messages: [...this.state.messages, {
+                id: messageModel.id,
+                text: messageText,
+                timeSent: messageModel.timeSent,
+                sender: messageModel.sender,
+            }]
+        })
     }
 
     escapeHtml = (unsafeText) => {
@@ -253,12 +278,12 @@ class App extends React.Component {
 
     // RENDER
     render() {
-        const { youAre, rooms, users, messages, activeRoom, activeUser } = this.state;
+        const { youAre, rooms, users, messages, activeRoom, activeUser, activePage } = this.state;
         return (
             <div className="row bg-light rounded border shadow h-100">
-                <Rooms rooms={rooms} activeRoom={activeRoom} createRoom={this.createRoom} onOpenRoom={this.openRoom} onJoin={this.joinRoom} onLeave={this.leaveRoom} />
-                <Users youAre={youAre} roomName={activeRoom} users={users} selectUser={this.selectUser} />
-                <Messages ref="messages" messages={messages} activeRoom={activeRoom} activeUser={activeUser} sendMessage={this.sendMessage} />
+                {(activePage == 'Rooms') && <Rooms rooms={rooms} activeRoom={activeRoom} createRoom={this.createRoom} onOpenRoom={this.openRoom} onJoin={this.joinRoom} onLeave={this.leaveRoom} />}
+                {(activePage == 'Users') && <Users youAre={youAre} roomName={activeRoom} users={users} selectUser={this.selectUser} setPage={this.setPage} />}
+                {(activePage == 'Chat') && <Messages ref="messages" youAre={youAre} messages={messages} activeRoom={activeRoom} activeUser={activeUser} sendMessage={this.sendMessage} setPage={this.setPage} />}
             </div>
         );
     }
@@ -275,8 +300,8 @@ class Rooms extends React.Component {
     render() {
         const { rooms, activeRoom, createRoom, onOpenRoom, onJoin, onLeave } = this.props;
         return (
-            <div className="col-md-3 bg-warning border p-0">
-                <div className="border-bottom p-2 my-0" style={{ height: chatApp().headersHeight }} ><button className="btn btn-sm btn-primary">Rooms</button></div>
+            <div className="col h-100 text-center bg-warning border p-0">
+                <div className="text-center border-bottom p-2 my-0"><button className="btn btn-sm btn-primary">Rooms</button></div>
                 <RoomsList rooms={rooms} activeRoom={activeRoom} onOpenRoom={onOpenRoom} onJoin={onJoin} onLeave={onLeave} />
                 <CreateRoom createRoom={createRoom} />
             </div>
@@ -287,10 +312,9 @@ class Rooms extends React.Component {
 // ROOMS LIST
 class RoomsList extends React.Component {
     render() {
-        const { listsHeight } = chatApp();
         const { rooms, activeRoom, onOpenRoom, onJoin, onLeave } = this.props;
         return (
-            <div className="p-2" style={{ height: `calc(100% ${listsHeight})`, overflowY: "scroll" }}>
+            <div id="roomsList" className="p-2">
                 {rooms.map((room, ix) => <RoomItem key={ix} room={room} activeRoom={activeRoom} onOpenRoom={onOpenRoom} onJoin={onJoin} onLeave={onLeave} />)}
             </div>
         )
@@ -313,10 +337,10 @@ class RoomItem extends React.Component {
         const { activeRoom } = this.props;
         const { name, isMember } = this.props.room;
         return (
-            <div className="my-1 d-flex">
+            <div className="bg-secondary d-flex p-1 my-2 rounded border shadow">
                 <button className={`btn btn-sm btn-${name === activeRoom ? 'primary' : (isMember ? 'success' : 'danger')} mx-1 px-2 rounded`}
-                    disabled={!isMember || (name === activeRoom)} datatoggle="tooltip"
-                    title={name === activeRoom ? 'You are in this room at the moment.' : (isMember ? 'Go To Room' : '')}
+                    disabled={!isMember} datatoggle="tooltip"
+                    title={name === activeRoom ? 'This is your current room.' : (isMember ? 'Go To Room' : '')}
                     onClick={() => this.props.onOpenRoom(this.props.room.name)} >{name}</button>
 
                 <div className="ml-auto">
@@ -335,7 +359,7 @@ class JoinLeaveButton extends React.Component {
         return (
             <form>
                 <input type="hidden" name="roomName" value={roomName} />
-                <button className={`btn btn-sm btn-${!isMember ? 'success' : 'danger'} mx-1 px-2 rounded`}
+                <button className={`btn btn-sm btn-outline-${!isMember ? 'success' : 'danger'} mx-1 px-2 rounded`}
                     datatoggle="tooltip" title={!isMember ? 'Join' : 'Leave'} onClick={onClick}>
                     <i className={`fas fa-sign-${!isMember ? 'in' : 'out'}-alt`}></i>
                 </button>
@@ -366,8 +390,7 @@ class CreateRoom extends React.Component {
         const { roomName } = this.state;
         return (
             <form onSubmit={this.onSubmit}
-                className="w-100 bg-dark border-top d-flex py-2"
-                style={{ height: chatApp().footersHeight }}>
+                className="w-100 bg-dark border-top d-flex py-2">
 
                 <input type="text"
                     name="roomName"
@@ -395,15 +418,23 @@ class CreateRoom extends React.Component {
 
 // USERS
 class Users extends React.Component {
+
     render() {
-        const { youAre, users, roomName, selectUser } = this.props;
+        const { youAre, users, roomName, selectUser, setPage } = this.props;
         return (
-            <div className="col-md-3 bg-secondary border p-0">
-                <div className="border-bottom p-2 my-0" style={{ height: chatApp().headersHeight }} >
-                    {roomName && <button className="btn btn-sm btn-primary">Members of ''{roomName}''</button>}
+            <div className="col h-100 bg-secondary border p-0">
+                <div className=" text-center border-bottom p-2 my-0">
+
+                    <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms')}>
+                        <i className="fas fa-angle-double-left"></i> Rooms</button>
+
+                    <button className="btn btn-sm btn-primary">Members of ''{roomName}''</button>
+
+                    <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Chat')}>
+                        Chat <i className="fas fa-angle-double-right"></i></button>
                 </div>
+
                 <UsersList youAre={youAre} users={users} selectUser={selectUser} />
-                <div style={{ height: chatApp().footersHeight }} className="border-top bg-dark"></div>
             </div>
         )
     }
@@ -412,10 +443,9 @@ class Users extends React.Component {
 // USERS LIST
 class UsersList extends React.Component {
     render() {
-        const { listsHeight } = chatApp();
         const { youAre, users, selectUser } = this.props;
         return (
-            <div className="p-2" style={{ height: `calc(100% ${listsHeight})`, overflowY: "scroll" }}>
+            <div id="usersList" className="p-2">
                 {users.filter(u => u.username !== youAre).map((user, ix) => <UserItem key={ix} user={user} selectUser={selectUser} />)}
             </div>
         )
@@ -425,12 +455,13 @@ class UsersList extends React.Component {
 // USER ITEM
 class UserItem extends React.Component {
     render() {
-        const { formatDate, shortTimeFormat } = chatApp();
-        const { username, joinedAt } = this.props.user;
+        const { formatDate, formatTimeShort } = chatApp();
+        const { username, isOnline, onlineAtUTC } = this.props.user;
+        console.log(onlineAtUTC);
         return (
             <div className="my-1 d-flex">
-                <button className="bg-primary mx-2 px-2 rounded" onClick={() => this.props.selectUser(username)}>{username}</button>
-                <div className="bg-warning mx-2 px-2 rounded ml-auto">{formatDate(joinedAt, shortTimeFormat)}</div >
+                <button className={`btn btn-${isOnline ? 'success' : 'danger'} mx-2 px-2 rounded`} onClick={() => this.props.selectUser(username)}>{username}</button>
+                {isOnline && <div className="bg-warning mx-2 px-2 rounded ml-auto">{formatDate(new Date(onlineAtUTC), formatTimeShort)}</div >}
             </div>
         )
     }
@@ -445,14 +476,19 @@ class UserItem extends React.Component {
 // MESSAGES
 class Messages extends React.Component {
     render() {
-        const { messages, sendMessage, activeRoom, activeUser } = this.props;
+        const { youAre, messages, sendMessage, activeRoom, activeUser, setPage } = this.props;
         return (
-            <div className="col-md-6 bg-light border p-0">
-                <div className="border-bottom p-2 my-0" style={{ height: chatApp().headersHeight }} >
+            <div className="col h-100 bg-light border p-0">
+                <div className="text-center border-bottom p-2 my-0">
+
+                    <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Users')}>
+                        <i className="fas fa-angle-double-left"></i> Users</button>
+
                     {activeRoom && <button className="btn btn-sm btn-primary">Room: {activeRoom}</button>}
                     {activeUser && <button className="btn btn-sm btn-primary">User: {activeUser}</button>}
+
                 </div>
-                <MessagesList messages={messages} />
+                <MessagesList messages={messages} youAre={youAre} />
                 <SendMessage ref="sendMessage" sendMessage={sendMessage} />
             </div>
         )
@@ -462,11 +498,10 @@ class Messages extends React.Component {
 // MESSAGES LIST
 class MessagesList extends React.Component {
     render() {
-        const { listsHeight } = chatApp();
-        const { messages } = this.props;
+        const { messages, youAre } = this.props;
         return (
-            <div id="messagesList" className="p-2" style={{ height: `calc(100% ${listsHeight})`, overflowY: "scroll" }}>
-                {messages.map((msg, ix) => <MessageItem key={ix} msg={msg} />)}
+            <div id="messagesList" className="p-2">
+                {messages.map((msg, ix) => <MessageItem key={ix} msg={msg} youAre={youAre} />)}
             </div>
         )
     }
@@ -475,13 +510,22 @@ class MessagesList extends React.Component {
 // MESSAGE ITEM
 class MessageItem extends React.Component {
     render() {
-        const { user, text } = this.props.msg;
-        const { you, userCircleSize } = chatApp();
-        const justify = 'd-flex justify-content-' + (user === you ? 'end' : 'start');
+        //console.log(this.props.msg);
+        const { userCircleSize, formatDate, formatTimeLong } = chatApp();
+        const { youAre, msg } = this.props;
+        const { sender, text, timeSent } = msg;
+        const isYou = (sender.username === youAre);
+        const justify = 'd-flex justify-content-' + (isYou ? 'end' : 'start');
         return (
-            <div className={`my-1 ${justify}`}>
-                <div className="bg-primary mx-2 px-2 rounded-circle" style={{ height: userCircleSize, width: userCircleSize, order: (user == you ? 1 : -1) }}>{user}</div>
-                <div className="bg-warning mx-2 px-2 rounded">{text}</div >
+            <div>
+                <div className={`my-1 ${justify}`}>
+                    <div className="bg-primary mx-2 px-2 rounded-circle"
+                        style={{ height: userCircleSize, width: userCircleSize, order: (isYou ? 1 : -1) }}>{sender.username}</div>
+                    <div className="bg-warning mx-2 px-2 rounded">{text}</div >
+                </div>
+                <div className={`mt-1 mb-4 ${justify}`}>
+                    <div className="bg-secondary text-white mx-2 px-2 rounded">{formatDate(new Date(timeSent), formatTimeLong)}</div >
+                </div>
             </div>
         )
     }
@@ -516,8 +560,7 @@ class SendMessage extends React.Component {
         const { message } = this.state;
         return (
             <form onSubmit={this.onSubmit}
-                className="w-100 bg-dark border-top d-flex py-2"
-                style={{ height: chatApp().footersHeight }}>
+                className="w-100 bg-dark border-top d-flex py-2">
 
                 <input type="text"
                     ref="messageInput"

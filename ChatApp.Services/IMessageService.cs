@@ -6,12 +6,13 @@
 
     public interface IMessageService
     {
-        Task CreateAsync(
+        Task<Message> CreateAsync(
             string text,
             User sender,
-            User recipient,
-            Room room);
+            User recipient = null,
+            Room room = null);
 
         Task<IEnumerable<Message>> AllInRoomAsync(string groupName);
+        Task<IEnumerable<Message>> AllWithUserAsync(string myId, string userId);
     }
 }

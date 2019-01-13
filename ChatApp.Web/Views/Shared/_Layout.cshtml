@@ -2,8 +2,6 @@
 @{const string navbarBgColor = "dark";}
 @{const string navbarFgColor = "light";}
 
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,6 +48,7 @@
 
 <body class="h-100">
 
+    @* HEADER *@
     <header class="mb-3">
 
         <nav class="navbar fixed-top navbar-expand-md navbar-@navbarBgColor bg-@navbarBgColor p-0">
@@ -100,8 +99,9 @@
                 <a class="navbar-brand mx-auto text-@navbarFgColor p-3"
                    data-toggle="tooltip"
                    data-container="body"
-                   title="<strong class='display-1'>Welcome!</strong><br /><span class='display-4 text-primary'>...</span>"
+                   title=""
                    asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="far fa-comments"></i>
                     @title.ToUpper()
                 </a>
             </div>
@@ -124,19 +124,17 @@
 
         </nav>
 
-        @*Take the space underneath the header when it is setup as fixed; TODO: Comment out otherwise!*@
         <div class="py-4">&nbsp;</div>
 
     </header>
 
-    @* NO SCRIPT *@
-    <noscript>
-        <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
-    </noscript>
-
-
     @* MESSAGES *@
     <div class="px-1">
+
+        @* NO SCRIPT *@
+        <noscript>
+            <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
+        </noscript>
 
         @if (TempData[GlobalConstants.SuccessMessage] != null)
         {
@@ -155,26 +153,16 @@
         }
     </div>
 
-
-
     @* BODY *@
-    <div class="container-fluid body-content h-100">
-        @RenderBody()
-    </div>
-
-
+    <div id="body-container" class="container">@RenderBody()</div>
 
     @* FOOTER *@
-    @*Take the space underneath the footer when it is setup as fixed; TODO: Comment out otherwise!*@
-    <div class="py-4">&nbsp;</div>
-    <footer id="main-footer"
-            class="footer container-fluid fixed-bottom
-            bg-@navbarBgColor text-@navbarFgColor">
-        <div class="container text-center">
-            <p>&copy; @DateTime.Now.Year - @title</p>
-        </div>
+    <div class="py-2">&nbsp;</div>
+    <footer id="main-footer" class="footer fixed-bottom container-fluid bg-@navbarBgColor text-@navbarFgColor">
+        <div class="container text-center"><p>&copy; @DateTime.Now.Year - @title</p></div>
     </footer>
 
+    
     @* DEVELOPMENT *@
     <environment include="Development">
 

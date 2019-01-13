@@ -2,13 +2,11 @@
 @model LoginViewModel
 @inject SignInManager<User> SignInManager
 
-@{
-    ViewData["Title"] = "Log in";
-}
-
+@{ ViewData["Title"] = "Log in";}
 <h2>@ViewData["Title"]</h2>
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <section>
             <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                 <h4>Use a local account to log in.</h4>
@@ -60,7 +58,7 @@
     </div>
 
 
-    <div class="col-md-6 col-md-offset-2">
+    <div class="col-md-6">
         <section>
             <h4>Use another service to log in.</h4>
             <hr />
@@ -70,7 +68,7 @@
                 {
                     <div>
                         <p>
-                            There are no external authentication services configured. 
+                            There are no external authentication services configured.
                             See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
                             for details on setting up this ASP.NET application to support logging in via external services.
                         </p>
@@ -83,8 +81,22 @@
                             <p>
                                 @foreach (var provider in loginProviders)
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" 
-                                            value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.Name</button>
+                                    <button type="submit" class="btn btn-outline-primary" name="provider"
+                                            value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                        @if (provider.Name == "Facebook")
+                                        {
+                                            <i class="fab fa-facebook-f text-danger"></i>
+                                        }
+                                        @if (provider.Name == "Google")
+                                        {
+                                            <i class="fab fa-google text-success"></i>
+                                        }
+                                        @if (provider.Name == "Microsoft")
+                                        {
+                                            <i class="fab fa-windows"></i>
+                                        }
+                                        @provider.Name
+                                    </button>
                                 }
                             </p>
                         </div>

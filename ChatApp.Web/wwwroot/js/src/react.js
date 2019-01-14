@@ -81,6 +81,8 @@ const chatApp = (() => {
             return format;
         },
         userCircleSize: 50,
+        userUsernamePropertyName: 'username',
+        roomModelNamePropertyName: 'name',
     }
 });
 
@@ -264,9 +266,9 @@ class App extends React.Component {
         //console.log(rooms);
 
         // move the Public room to the top
-        const { publicRoomName } = chatApp();
+        const { publicRoomName, roomModelNamePropertyName } = chatApp();
         const publicRoom = roomModels.find(r => r.name === publicRoomName);
-        roomModels = this.sortByProperty('name', roomModels.filter(r => r.name !== publicRoomName));
+        roomModels = this.sortByProperty(roomModelNamePropertyName, roomModels.filter(r => r.name !== publicRoomName));
         // setState
         this.setState({ rooms: [publicRoom, ...roomModels] });
     }
@@ -286,21 +288,26 @@ class App extends React.Component {
 
     // PUSH USERS
     pushUsers = (userModels) => {
+        const { userUsernamePropertyName } = chatApp();
         console.log('Users:' + userModels.length);
         //console.log(userModels);
-        this.setState({ users: this.sortByProperty('username', userModels) });
+        this.setState({ users: this.sortByProperty(userUsernamePropertyName, userModels) });
     }
 
     // USER ONLINE
     userOnline = (userModel) => {
+        const { userUsernamePropertyName } = chatApp();
         //console.log(userModel);
         this.userOffline(userModel.username);
-        const userModels = this.sortByProperty('username', [...this.state.users, userModel]);
+        const userModels = this.sortByProperty(userUsernamePropertyName, [...this.state.users, userModel]);
         this.setState({ users: userModels });
     }
 
     // USER OFFLINE
-    userOffline = (username) => this.setState({ users: this.sortByProperty('username', this.state.users.filter(user => user.username !== username)) });
+    userOffline = (username) => {
+        const { userUsernamePropertyName } = chatApp();
+        this.setState({ users: this.sortByProperty(userUsernamePropertyName, this.state.users.filter(user => user.username !== username)) });
+    }
 
 
     /////////////
@@ -316,11 +323,11 @@ class App extends React.Component {
         const { activeRoom, activeUser } = this.state;
 
         if (activeUser) { // private message to another user
-            console.log('sending to user: ' + activeUser.username);
+            console.log(`sending to user: ${activeUser.username} - ${messageText}`);
             this.connection.invoke(sendPrivateMessage, activeUser.username, messageText).catch(err => console.error(err.toString()));
         }
         else if (activeRoom) { // message to a given room
-            console.log('sending to room: ' + activeRoom.name);
+            console.log(`sending to room: ${activeRoom.name} - ${messageText}`);
             this.connection.invoke(sendMessageToGroup, activeRoom.name, messageText).catch(err => console.error(err.toString()));
         }
         else {
@@ -335,12 +342,15 @@ class App extends React.Component {
         }
 
         this.refs.messages
+            .refs.messagesFooter
             .refs.sendMessage
             .refs.messageInput.focus();
     }
 
+
     // PUSH MESSAGE
     pushMessage = (messageModel) => {
+        console.log(messageModel);
         const messageText = this.escapeHtml(messageModel.text);
         this.setState({
             messages: [...this.state.messages, {
@@ -369,7 +379,7 @@ class App extends React.Component {
 
     // RENDER
     render() {
-        const { youAre, rooms, users, messages, activeRoom, activeUser, activePage } = this.state;
+        const { youAre, rooms, users, messages, activeRoom, lastActiveRoom, activeUser, lastActiveUser, activePage } = this.state;
         return (
             <div className="row bg-light rounded border shadow h-100">
 
@@ -396,7 +406,10 @@ class App extends React.Component {
                         ref="messages"
                         youAre={youAre}
                         activeRoom={activeRoom}
+                        activeRoom={activeRoom}
                         activeUser={activeUser}
+                        lastActiveRoom={lastActiveRoom}
+                        lastActiveUser={lastActiveUser}
                         sendMessage={this.sendMessage}
                         setPage={this.setPage}
                     />}
@@ -612,29 +625,40 @@ class UserItem extends React.Component {
 
 // MESSAGES
 class Messages extends React.Component {
+
+    state = { filterTerm: '' };
+    filterClear = (e) => {
+        if (e) { e.preventDefault(); }
+        this.setState({ filterTerm: '' });
+    }
+    filterChange = (e) => this.setState({ [e.target.name]: e.target.value });
+
+
     render() {
         const { publicRoomName } = chatApp();
+        const filter = { term: this.state.filterTerm, clear: this.filterClear, change: this.filterChange };
         const { youAre, messages, sendMessage, activeRoom, lastActiveRoom, activeUser, setPage } = this.props;
+        const room = activeRoom ? activeRoom : lastActiveRoom;
         return (
             <div className="col h-100 bg-light border p-0">
                 <div className="bg-dark text-center border-bottom p-2 my-0">
 
                     {/* << Rooms button */}
-                    {<button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', activeRoom ? activeRoom : lastActiveRoom)}><ArrowsLeft /> Rooms <IconRooms /></button>}
+                    {<button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', room)}><ArrowsLeft /> Rooms <IconRooms /></button>}
 
                     {/* Room / User */}
-                    {activeRoom && <button disabled className="btn btn-sm btn-primary"><IconRoom /> Room: {activeRoom.name}</button>}
+                    {activeRoom && <button disabled className="btn btn-sm btn-primary"><IconRoom /> Room: {room.name}</button>}
                     {activeUser && <button disabled className={`btn btn-sm btn-${activeUser.isOnline ? 'success' : 'danger'}`}><IconUser /> User: {activeUser.username}</button>}
 
                     {/* button Members >>  */}
-                    {<button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Users', activeRoom ? activeRoom : lastActiveRoom)}>
-                        <IconUsers /> Members of {(activeRoom.name === publicRoomName) ? <IconPublic /> : ''} {activeRoom.name} <ArrowsRight />
+                    {<button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Users', room)}>
+                        <IconUsers /> Members of {(room.name === publicRoomName) ? <IconPublic /> : ''} {room.name} <ArrowsRight />
                     </button>}
 
                 </div>
 
-                <MessagesList messages={messages} youAre={youAre} />
-                <SendMessage ref="sendMessage" sendMessage={sendMessage} />
+                <MessagesList messages={messages} filter={filter} youAre={youAre} />
+                <MessagesFooter ref="messagesFooter" sendMessage={sendMessage} filter={filter} />
             </div>
         )
     }
@@ -643,11 +667,18 @@ class Messages extends React.Component {
 // MESSAGES LIST
 class MessagesList extends React.Component {
     render() {
-        const { messages, youAre } = this.props;
+        const { messages, filter, youAre } = this.props;
+        console.log(filter.term);
+        let msgs = messages.filter(m => m.text.includes(filter.term));
         return (
             <div id="messagesList" className="p-2">
-                {(messages.length > 0) && messages.map((msg, ix) => <MessageItem key={ix} msg={msg} youAre={youAre} />)}
-                {(messages.length == 0) && <div className="text-center bg-warning p-3 m-5 rounded shadow display-4">No Messages Here</div>}
+                {(msgs.length > 0) &&
+                    <div>
+                        {filter.term && <div className="text-center bg-warning p-3 m-5 rounded shadow display-4">Messages containing <br /> '{filter.term}'</div>}
+                        <div>{msgs.map((msg, ix) => <MessageItem key={ix} msg={msg} youAre={youAre} />)}</div>
+                    </div>}
+                {(msgs.length == 0)
+                    && <div className="text-center bg-warning p-3 m-5 rounded shadow display-4">No Messages {filter.term ? <span><br />containing '{filter.term}'</span> : ''}</div>}
             </div>
         )
     }
@@ -677,6 +708,32 @@ class MessageItem extends React.Component {
     }
 }
 
+
+// MESSAGES FOOTER
+class MessagesFooter extends React.Component {
+
+    state = { showFilter: false }
+
+    onToggle = () => {
+        this.setState({ showFilter: !this.state.showFilter });
+        if (this.state.showFilter) { this.props.filter.clear(); }
+    }
+
+    render() {
+        const { showFilter } = this.state;
+        const { sendMessage, filter } = this.props;
+        return (
+            <div className="w-100 bg-dark border-top d-flex py-2">
+                {!showFilter
+                    ? <div className="d-flex w-100"><button className="btn btn-sm btn-warning mx-1" title="Toggle Filter" onClick={() => this.onToggle()}><IconToggleOff /></button> <SendMessage ref="sendMessage" sendMessage={sendMessage} /></div>
+                    : <div className="d-flex w-100"><button className="btn btn-sm btn-warning mx-1" title="Toggle Filter" onClick={() => this.onToggle()}><IconToggleOn /></button> <FilterMessages filter={filter} /></div>
+                }
+            </div>
+        )
+    }
+}
+
+
 // SEND MESSAGE
 class SendMessage extends React.Component {
 
@@ -693,7 +750,6 @@ class SendMessage extends React.Component {
 
     onChange = (e) => this.setState({ [e.target.name]: e.target.value });
 
-
     componentDidUpdate() {
         const objDiv = document.getElementById("messagesList");
         objDiv.scrollTop = objDiv.scrollHeight;
@@ -702,8 +758,7 @@ class SendMessage extends React.Component {
     render() {
         const { message } = this.state;
         return (
-            <form onSubmit={this.onSubmit}
-                className="w-100 bg-dark border-top d-flex py-2">
+            <form className="d-flex w-100" onSubmit={this.onSubmit}>
 
                 <input type="text"
                     ref="messageInput"
@@ -722,6 +777,37 @@ class SendMessage extends React.Component {
     }
 }
 
+// FILTER MESSAGES
+class FilterMessages extends React.Component {
+
+    componentDidUpdate() {
+        const objDiv = document.getElementById("messagesList");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+
+    render() {
+        const { term, clear, change } = this.props.filter;
+        return (
+            <form className="d-flex w-100" onSubmit={clear}>
+
+                <input type="text"
+                    ref="filterTermInput"
+                    name="filterTerm"
+                    className="form-control mx-1"
+                    placeholder="Filter messages..."
+                    autoFocus={true}
+                    value={term}
+                    onChange={change}
+                />
+
+                <button type="submit" className="btn btn-sm btn-primary mx-1" title="Filter"><IconClearFilter /></button>
+
+            </form>
+        )
+    }
+}
+
+
 function ArrowsLeft() { return <i className="fas fa-angle-double-left"></i>; }
 function ArrowsRight() { return <i className="fas fa-angle-double-right"></i>; }
 function IconRoom() { return <i className="fab fa-react"></i> }
@@ -735,6 +821,9 @@ function IconMessage() { return <i className="far fa-comment"></i> }
 function IconGithub() { return <i className="fab fa-github"></i> }
 function IconSend() { return <i className="far fa-share-square"></i> }
 function IconAdd() { return <i className="fas fa-plus"></i> }
+function IconToggleOn() { return <i className="fas fa-toggle-on"></i> }
+function IconToggleOff() { return <i className="fas fa-toggle-off"></i> }
+function IconClearFilter() { return <span className="fa-stack"><i className="fa fa-filter fa-stack-1x"></i><i className="fa fa-ban fa-stack-2x text-danger"></i></span> }
 
 
 const domContainer = document.querySelector('#root');

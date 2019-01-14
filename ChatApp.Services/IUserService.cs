@@ -2,15 +2,16 @@
 {
     using ChatApp.Data.Models;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public interface IUserService
     {
-        User ById(string id);
+        Task<User> ByIdAsync(string id);
 
-        User ByUsername(string username);
+        Task<User> ByUsernameAsync(string username);
 
-        List<User> All();
+        Task<List<User>> AllAsync();
 
-        void Update(string id);
+        Task UpdateAsync(string id);
     }
 }

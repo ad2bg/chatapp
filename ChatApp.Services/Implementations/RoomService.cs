@@ -33,13 +33,13 @@
         }
 
 
-        // GET BY NAME
-        public Room GetByName(string roomName) =>
-            this.db.Rooms
+        // GET BY NAME ASYNC
+        public async Task<Room> GetByNameAsync(string roomName) =>
+            await this.db.Rooms
             .Where(r => r.Name == roomName)
             .Include(r => r.RoomMembers)
             .ThenInclude(rm => rm.Member)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
 
 
@@ -99,10 +99,10 @@
         // ADD MEMBER
         public async Task AddMemberAsync(string groupName, User user)
         {
-            var room = this.GetByName(groupName);
+            var room = await this.GetByNameAsync(groupName);
             if (room == null) { throw new ArgumentException("Invalid room name: " + groupName); }
             if (user == null) { throw new ArgumentException("Invalid user"); }
-            var members = this.GetMembers(groupName);
+            var members = await this.GetMembersAsync(groupName);
             if (members.Contains(user)) { return; }
             var roomMember = new RoomMember { Room = room, Member = user };
             room.RoomMembers.Add(roomMember);
@@ -112,7 +112,7 @@
         // REMOVE MEMBER
         public async Task RemoveMemberAsync(string groupName, User user)
         {
-            var room = this.GetByName(groupName);
+            var room = await this.GetByNameAsync(groupName);
             if (room == null) { throw new ArgumentException("Invalid room name: " + groupName); }
             if (user == null) { throw new ArgumentException("Invalid user"); }
             room.RoomMembers = room.RoomMembers.Where(rm => rm.Member.Id != user.Id).ToList();
@@ -122,9 +122,9 @@
 
 
         // GET MEMBERS
-        public List<User> GetMembers(string groupName)
+        public async Task<List<User>> GetMembersAsync(string groupName)
         {
-            var room = this.GetByName(groupName);
+            var room = await this.GetByNameAsync(groupName);
             if (room == null) { throw new ArgumentException("Invalid room name: " + groupName); }
             return room.RoomMembers.Select(rm => rm.Member).ToList();
         }

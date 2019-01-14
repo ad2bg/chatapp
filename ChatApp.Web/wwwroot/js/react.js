@@ -7,17 +7,17 @@ const chatApp = (() => {
         connectionUrl: '/chatHub',
 
         // server-side methods
-        hubGetData: 'GetData',
-        hubCreateRoom: 'CreateRoom',
-        hubJoinRoom: 'JoinRoom',
-        hubLeaveRoom: 'LeaveRoom',
-        sendPublicMessage: 'SendPublicMessage',
-        sendMessageToGroup: 'SendMessageToGroup',
-        sendPrivateMessage: 'SendPrivateMessage',
-        hubPushAllUsers: 'PushAllUsers',
-        hubPushRoomMembers: 'PushRoomMembers',
-        hubPushRoomMessages: 'PushRoomMessages',
-        hubPushUserMessages: 'PushUserMessages',
+        hubGetData: 'GetDataAsync',
+        hubCreateRoom: 'CreateRoomAsync',
+        hubJoinRoom: 'JoinRoomAsync',
+        hubLeaveRoom: 'LeaveRoomAsync',
+        hubPushAllUsers: 'PushAllUsersAsync',
+        hubPushRoomMembers: 'PushRoomMembersAsync',
+        hubPushRoomMessages: 'PushRoomMessagesAsync',
+        hubPushUserMessages: 'PushUserMessagesAsync',
+        sendPublicMessage: 'SendPublicMessageAsync',
+        sendMessageToGroup: 'SendMessageToGroupAsync',
+        sendPrivateMessage: 'SendPrivateMessageAsync',
 
         // client-side methods
         getData: "getData",

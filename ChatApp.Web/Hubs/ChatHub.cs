@@ -53,8 +53,8 @@
 
 
 
-        // CONNECTED
-        public override Task OnConnectedAsync()
+        // CONNECTED ASYNC
+        public override async Task OnConnectedAsync()
         {
             try
             {
@@ -62,7 +62,7 @@
 
                 // get user
                 string myUsername = Context.User.Identity.Name;
-                var user = this.userService.ByUsername(myUsername);
+                var user = await this.userService.ByUsernameAsync(myUsername);
                 var connectionId = Context.ConnectionId;
 
                 if (myUsername != null)
@@ -82,20 +82,17 @@
 
                         // connect to groups
                         var roomNames = user.RoomMembers.Select(rm => rm.Room.Name).ToList();
-                        Task.Run(async () =>
+                        foreach (var roomName in roomNames)
                         {
-                            foreach (var roomName in roomNames)
+                            try
                             {
-                                try
-                                {
-                                    await this.JoinRoom(roomName);
-                                }
-                                catch (Exception)
-                                {
-                                    Console.WriteLine($"Error connecting {myUsername} to group {roomName}.");
-                                }
+                                await this.JoinRoomAsync(roomName);
                             }
-                        }).Wait();
+                            catch (Exception)
+                            {
+                                Console.WriteLine($"Error connecting {myUsername} to group {roomName}.");
+                            }
+                        }
                     }
 
 
@@ -103,7 +100,7 @@
                     var userModel = GetUserModel(user);
                     foreach (var roomName in user.RoomMembers.Select(rm => rm.Room.Name))
                     {
-                        Clients.Group(roomName).SendAsync(userOnline, userModel);
+                        await Clients.Group(roomName).SendAsync(userOnline, userModel);
                     }
                     //Clients.All.SendAsync(userOnline, userModel);  //  notify ALL users
 
@@ -112,13 +109,13 @@
             }
             catch (Exception e)
             {
-                Task.Run(async () => await LogError(e)).Wait();
+                await LogError(e);
             }
-            return base.OnConnectedAsync();
+            await base.OnConnectedAsync();
         }
 
-        // DISCONNECTED
-        public override Task OnDisconnectedAsync(Exception exception)
+        // DISCONNECTED ASYNC
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
             try
             {
@@ -128,20 +125,20 @@
 
                 if (myUsername != null)
                 {
-                    Task.Delay(disconnectTolerance).ContinueWith(t => GoOffline(myUsername));
+                    await Task.Delay(disconnectTolerance).ContinueWith(async (t) => await GoOfflineAsync(myUsername));
                 }
 
                 Console.WriteLine($"~~~~~~ - {connectionId} - {myUsername}");
             }
             catch (Exception e)
             {
-                Task.Run(async () => await LogError(e)).Wait();
+                await LogError(e);
             }
-            return base.OnDisconnectedAsync(exception);
+            await base.OnDisconnectedAsync(exception);
         }
 
-        // go offline
-        private void GoOffline(string username)
+        // go offline async
+        private async Task GoOfflineAsync(string username)
         {
             if (username == null) { return; }
             if (!disconnected.ContainsKey(username)) { return; } // the user has reconnected within the disconnectTolerance
@@ -154,19 +151,19 @@
                 connectionIds.Remove(username);
 
                 // push to clients
-                Clients.All.SendAsync(userOffline, username);
+                await Clients.All.SendAsync(userOffline, username);
             }
             catch (Exception e)
             {
-                Task.Run(async () => await LogError(e)).Wait();
+                await LogError(e);
             }
             Console.WriteLine($"OFFLINE - {username}");
         }
 
 
 
-        // GET DATA
-        public async Task GetData()
+        // GET DATA ASYNC
+        public async Task GetDataAsync()
         {
             try
             {
@@ -191,8 +188,8 @@
 
 
 
-        // CREATE ROOM
-        public async Task CreateRoom(string groupName)
+        // CREATE ROOM ASYNC
+        public async Task CreateRoomAsync(string groupName)
         {
             var connectionId = Context.ConnectionId;
             var myUsername = Context.User.Identity.Name;
@@ -212,8 +209,8 @@
         }
 
 
-        // JOIN ROOM
-        public async Task JoinRoom(string groupName)
+        // JOIN ROOM ASYNC
+        public async Task JoinRoomAsync(string groupName)
         {
             try
             {
@@ -225,10 +222,8 @@
                 var connectionId = Context.ConnectionId;
                 await Groups.AddToGroupAsync(connectionId, groupName);
                 // notify all room members
-                var userModels = this.roomService
-                    .GetMembers(groupName)
-                    .Select(u => GetUserModel(u))
-                    .OrderBy(m => m.Username);
+                var users = await this.roomService.GetMembersAsync(groupName);
+                var userModels = users.Select(u => GetUserModel(u)).OrderBy(m => m.Username);
                 await Clients.OthersInGroup(groupName).SendAsync(pushUsers, userModels);
                 // getData
                 await Clients.Caller.SendAsync(getData);
@@ -239,8 +234,8 @@
             }
         }
 
-        // LEAVE ROOM
-        public async Task LeaveRoom(string groupName)
+        // LEAVE ROOM ASYNC
+        public async Task LeaveRoomAsync(string groupName)
         {
             try
             {
@@ -252,7 +247,8 @@
                 var connectionId = Context.ConnectionId;
                 await Groups.RemoveFromGroupAsync(connectionId, groupName);
                 // notify all room members
-                var userModels = this.roomService.GetMembers(groupName).Select(u => GetUserModel(u));
+                var users = await this.roomService.GetMembersAsync(groupName);
+                var userModels = users.Select(u => GetUserModel(u));
                 await Clients.Group(groupName).SendAsync(pushUsers, userModels);
                 // getData
                 await Clients.Caller.SendAsync(getData);
@@ -264,13 +260,13 @@
         }
 
 
-        // PUSH ALL USERS
-        public async Task PushAllUsers()
+        // PUSH ALL USERS ASYNC
+        public async Task PushAllUsersAsync()
         {
             try
             {
                 var myUsername = Context.User.Identity.Name; // caller username
-                var users = this.userService.All();
+                var users = await this.userService.AllAsync();
                 var userModels = users.Select(u => GetUserModel(u));
                 await Clients.Caller.SendAsync(pushUsers, userModels);
             }
@@ -280,13 +276,13 @@
             }
         }
 
-        // PUSH ROOM MEMBERS
-        public async Task PushRoomMembers(string groupName)
+        // PUSH ROOM MEMBERS ASYNC
+        public async Task PushRoomMembersAsync(string groupName)
         {
             try
             {
                 var myUsername = Context.User.Identity.Name; // caller username
-                var users = this.roomService.GetMembers(groupName);
+                var users = await this.roomService.GetMembersAsync(groupName);
                 var userModels = users.Select(u => GetUserModel(u));
                 await Clients.Caller.SendAsync(pushUsers, userModels);
             }
@@ -296,8 +292,8 @@
             }
         }
 
-        // PUSH ROOM MESSAGES
-        public async Task PushRoomMessages(string groupName)
+        // PUSH ROOM MESSAGES ASYNC
+        public async Task PushRoomMessagesAsync(string groupName)
         {
             try
             {
@@ -311,8 +307,8 @@
             }
         }
 
-        // PUSH USER MESSAGES
-        public async Task PushUserMessages(string username)
+        // PUSH USER MESSAGES ASYNC
+        public async Task PushUserMessagesAsync(string username)
         {
             try
             {
@@ -332,8 +328,8 @@
 
 
 
-        // SEND PUBLIC MESSAGE
-        public async Task SendPublicMessage(string messageText)
+        // SEND PUBLIC MESSAGE ASYNC
+        public async Task SendPublicMessageAsync(string messageText)
         {
             try
             {
@@ -353,14 +349,14 @@
 
         }
 
-        // SEND MESSAGE TO GROUP
-        public async Task SendMessageToGroup(string groupName, string messageText)
+        // SEND MESSAGE TO GROUP ASYNC
+        public async Task SendMessageToGroupAsync(string groupName, string messageText)
         {
             try
             {
                 string myUsername = Context.User.Identity.Name; // sender username
                 var sender = await this.userManager.FindByNameAsync(myUsername);
-                var room = this.roomService.GetByName(groupName);
+                var room = await this.roomService.GetByNameAsync(groupName);
                 // store in DB
                 var message = await this.messageService.CreateAsync(messageText, sender, null, room);
                 // push to clients
@@ -375,15 +371,15 @@
             }
         }
 
-        // SEND PRIVATE MESSAGE
-        public async Task SendPrivateMessage(string recipientUsername, string messageText)
+        // SEND PRIVATE MESSAGE ASYNC
+        public async Task SendPrivateMessageAsync(string recipientUsername, string messageText)
         {
             try
             {
                 string myUsername = Context.User.Identity.Name; // sender username
                 var sender = await this.userManager.FindByNameAsync(myUsername);
                 //var recipient = await this.userManager.FindByNameAsync(recipientUsername);
-                var recipient = this.userService.ByUsername(recipientUsername);
+                var recipient = await this.userService.ByUsernameAsync(recipientUsername);
                 // store in DB
                 var message = await this.messageService.CreateAsync(messageText, sender, recipient);
                 // push to clients

@@ -5,49 +5,43 @@
     using Microsoft.EntityFrameworkCore;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class UserService : IUserService
     {
         private readonly ChatAppDbContext db;
 
-        public UserService(
-            ChatAppDbContext db
-            )
+        public UserService(ChatAppDbContext db)
         {
             this.db = db;
         }
 
-
-        // BY ID
-        public User ById(string id) =>
-            this.db.Users
+        // BY ID ASYNC
+        public async Task<User> ByIdAsync(string id) =>
+            await this.db.Users
             .Where(u => u.Id == id)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
-
-        // BY USERNAME
-        public User ByUsername(string username) =>
-            this.db.Users
+        // BY USERNAME ASYNC
+        public async Task<User> ByUsernameAsync(string username) =>
+            await this.db.Users
             .Where(u => u.UserName == username)
             .Include(u => u.RoomMembers)
             .ThenInclude(rm => rm.Room)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
-        // All
-        public List<User> All() => 
-            this.db.Users
+        // All ASYNC
+        public async Task<List<User>> AllAsync() => 
+            await this.db.Users
             .Include(u => u.RoomMembers)
             .ThenInclude(rm => rm.Room)
-            .ToList();
-        
-
-
-        // UPDATE
-        public void Update(string id)
+            .ToListAsync();
+       
+        // UPDATE ASYNC
+        public async Task UpdateAsync(string id)
         {
-            if (ById(id) == null) { return; }
-            db.SaveChanges();
+            if (await ByIdAsync(id) == null) { return; }
+            await db.SaveChangesAsync();
         }
-
     }
 }

@@ -9,7 +9,7 @@
     {
         bool Exists(string roomName);
 
-        Room GetByName(string roomName);
+        Task<Room> GetByNameAsync(string roomName);
 
         Task CreateAsync(string roomName, User owner);
 
@@ -18,7 +18,7 @@
         Task AddMemberAsync(string groupName, User user);
         Task RemoveMemberAsync(string groupName, User user);
 
-        List<User> GetMembers(string groupName);
+        Task<List<User>> GetMembersAsync(string groupName);
     }
 }
 

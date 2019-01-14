@@ -424,8 +424,15 @@
         // log error
         private async Task LogError(Exception e)
         {
-            Console.WriteLine($"ERROR on server: {e.Message}");
-            await Clients.Caller.SendAsync(notify, e.Message);
+            try
+            {
+                Console.WriteLine($"ERROR on server: {e.Message}");
+                await Clients.Caller.SendAsync(notify, e.Message);
+            }
+            catch (Exception)
+            {
+            }
+
         }
     }
 }

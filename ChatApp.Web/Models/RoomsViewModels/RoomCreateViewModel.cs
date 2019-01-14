@@ -8,9 +8,9 @@
 
         [Required]
         [StringLength(
-            maximumLength:GlobalConstants.RoomNameMaxLength,
-            MinimumLength = GlobalConstants.RoomNameMinLength,
-            ErrorMessage = GlobalConstants.StringLengthErrorMessage)]
+            maximumLength:WebConstants.RoomNameMaxLength,
+            MinimumLength = WebConstants.RoomNameMinLength,
+            ErrorMessage = WebConstants.StringLengthErrorMessage)]
         public string RoomName { get; set; }
     }
 }

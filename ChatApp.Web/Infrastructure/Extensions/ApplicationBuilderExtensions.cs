@@ -31,7 +31,7 @@
             Task.Run(async () =>
             {
                 // create Admin role
-                var adminRoleName = GlobalConstants.AdministratorRole;
+                var adminRoleName = WebConstants.AdministratorRole;
                 var roleExists = await roleManager.RoleExistsAsync(adminRoleName);
                 if (!roleExists)
                 {
@@ -42,7 +42,7 @@
                 }
 
                 // create Admin and assign Admin role
-                var adminEmail = GlobalConstants.AdministratorEmail;
+                var adminEmail = WebConstants.AdministratorEmail;
                 var adminUser = await userManager.FindByNameAsync(adminEmail);
                 if (adminUser == null)
                 {

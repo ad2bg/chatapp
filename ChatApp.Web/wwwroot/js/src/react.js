@@ -425,15 +425,14 @@ class Rooms extends React.Component {
 
                     <button className="btn btn-sm btn-primary" disabled><IconRooms /> Rooms: {rooms.length}</button>
 
-                    {activeRoom && <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Chat', activeRoom, null)}>
-                        {(activeRoom.name === publicRoomName) && <IconPublic />} Room: {activeRoom.name} <ArrowsRight /></button>}
-                    {activeUser && <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Chat', null, activeUser)}>
-                        <IconUser /> User: {activeUser.username} <ArrowsRight /></button>}
+                    <button className="btn btn-sm btn-primary float-right" onClick={() => activeRoom ? setPage('Chat', activeRoom, null) : setPage('Chat', null, activeUser)}>
+                        {activeRoom ? <span> <IconRoom /> {activeRoom.name} {(activeRoom.name === publicRoomName) && <IconPublic />}</span> : <span> <IconUser />  User: {activeUser.username}  </span>} <ArrowsRight />
+                    </button>
                 </div>
 
                 <RoomsList rooms={rooms} activeRoom={activeRoom} onJoin={onJoin} onLeave={onLeave} setPage={setPage} />
                 <CreateRoom createRoom={createRoom} />
-            </div>
+            </div >
         )
     }
 }
@@ -473,14 +472,14 @@ class RoomItem extends React.Component {
                     <button className={`btn btn-sm btn-${(activeRoom && name === activeRoom.name) ? 'primary' : (isMember ? 'success' : 'danger')} mx-1 px-2 rounded`}
                         datatoggle="tooltip" title={(activeRoom && name === activeRoom.name) ? 'This is your current room.' : (isMember ? 'Chat!' : 'You need to join the room.')}
                         disabled={!isMember} onClick={() => setPage('Chat', room, null)} >
-                        {(name === publicRoomName) && <IconPublic />} {name}
+                        <IconRoom /> {name} {(name === publicRoomName) && <IconPublic />}
                     </button>
                 }
 
                 { // Members button
                     <button className={`btn btn-sm btn-${(activeRoom && name === activeRoom.name) ? 'primary' : (isMember ? 'success' : 'danger')} mx-1 px-2 rounded`}
                         datatoggle="tooltip" title={isMember ? 'See Room Members' : 'You need to join the room.'}
-                        disabled={!isMember} onClick={() => setPage('Users', room, null)} >{membersCount} members</button>
+                        disabled={!isMember} onClick={() => setPage('Users', room, null)} ><IconUsers />: {membersCount} </button>
                 }
 
                 { // Join / Leave button
@@ -560,15 +559,15 @@ class Users extends React.Component {
 
     render() {
         const { publicRoomName } = chatApp();
-        const { users, activeRoom, setPage } = this.props;
+        const { users, activeRoom, lastActiveRoom, setPage } = this.props;
         return (
             <div className="col h-100 bg-secondary border p-0">
                 <div className=" bg-dark text-center border-bottom p-2 my-0">
-                    <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms')}><ArrowsLeft /> Rooms <IconRooms /></button>
+                    <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', activeRoom ? activeRoom : lastActiveRoom)}><ArrowsLeft /> Rooms <IconRooms /></button>
                     <button className="btn btn-sm btn-primary" disabled>
-                        {activeRoom ? <span>Members of ''{(activeRoom.name === publicRoomName) && <IconPublic />} {activeRoom.name}''</span> : <span>All Members</span>}
+                        {activeRoom ? <span><IconUsers /> Members of ''{(activeRoom.name === publicRoomName) && <IconPublic />} {activeRoom.name}''</span> : <span><IconAllUsers /> All Users</span>}
                         : {users.length}</button>
-                    <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Chat')}>Chat <ArrowsRight /></button>
+                    <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Chat', activeRoom ? activeRoom : lastActiveRoom)}><IconMessages /> Chat <ArrowsRight /></button>
                 </div>
 
                 <UsersList users={users} setPage={setPage} />
@@ -614,20 +613,23 @@ class UserItem extends React.Component {
 // MESSAGES
 class Messages extends React.Component {
     render() {
-        const { youAre, messages, sendMessage, activeRoom, activeUser, setPage } = this.props;
+        const { publicRoomName } = chatApp();
+        const { youAre, messages, sendMessage, activeRoom, lastActiveRoom, activeUser, setPage } = this.props;
         return (
             <div className="col h-100 bg-light border p-0">
                 <div className="bg-dark text-center border-bottom p-2 my-0">
 
-                    { // << Rooms button
-                        activeRoom && <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', activeRoom)}><ArrowsLeft /> Rooms</button>}
+                    {/* << Rooms button */}
+                    {<button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', activeRoom ? activeRoom : lastActiveRoom)}><ArrowsLeft /> Rooms <IconRooms /></button>}
 
                     {/* Room / User */}
                     {activeRoom && <button disabled className="btn btn-sm btn-primary"><IconRoom /> Room: {activeRoom.name}</button>}
                     {activeUser && <button disabled className={`btn btn-sm btn-${activeUser.isOnline ? 'success' : 'danger'}`}><IconUser /> User: {activeUser.username}</button>}
 
-                    { // button Members >>
-                        activeRoom && <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Users', activeRoom)}><IconUsers /> Members <ArrowsRight /></button>}
+                    {/* button Members >>  */}
+                    {<button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Users', activeRoom ? activeRoom : lastActiveRoom)}>
+                        <IconUsers /> Members of {(activeRoom.name === publicRoomName) ? <IconPublic /> : ''} {activeRoom.name} <ArrowsRight />
+                    </button>}
 
                 </div>
 
@@ -722,15 +724,14 @@ class SendMessage extends React.Component {
 
 function ArrowsLeft() { return <i className="fas fa-angle-double-left"></i>; }
 function ArrowsRight() { return <i className="fas fa-angle-double-right"></i>; }
-function IconRoom() { return <i className="far fa-square"></i> }
-function IconRooms() { return <i className="far fa-object-ungroup"></i> }
+function IconRoom() { return <i className="fab fa-react"></i> }
+function IconRooms() { return <span><IconRoom /><IconRoom /></span> }
 function IconPublic() { return <i className="fas fa-globe-americas"></i> }
 function IconAllUsers() { return <i className="fas fa-users"></i> }
 function IconUser() { return <i className="far fa-user"></i> }
 function IconUsers() { return <i className="fas fa-user-friends"></i> }
 function IconMessages() { return <i className="far fa-comments"></i> }
 function IconMessage() { return <i className="far fa-comment"></i> }
-function IconReact() { return <i className="fab fa-react"></i> }
 function IconGithub() { return <i className="fab fa-github"></i> }
 function IconSend() { return <i className="far fa-share-square"></i> }
 function IconAdd() { return <i className="fas fa-plus"></i> }

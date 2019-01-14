@@ -1,6 +1,6 @@
 ﻿namespace ChatApp.Web.Infrastructure
 {
-    public class GlobalConstants
+    public class WebConstants
     {
         public const string Domain = "http://localhost:55555/";
         public const string AdministratorRole = "Administrator";

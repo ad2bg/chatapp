@@ -8,9 +8,9 @@
 
         [Required]
         [StringLength(
-            maximumLength:GlobalConstants.UserUsernameMaxLength,
-            ErrorMessage = GlobalConstants.StringLengthErrorMessage, 
-            MinimumLength = GlobalConstants.UserUsernameMinLength)]
+            maximumLength:WebConstants.UserUsernameMaxLength,
+            ErrorMessage = WebConstants.StringLengthErrorMessage, 
+            MinimumLength = WebConstants.UserUsernameMinLength)]
         public string Username { get; set; }
 
         [Required]
@@ -20,9 +20,9 @@
 
         [Required]
         [StringLength(
-            maximumLength:GlobalConstants.UserPasswordMaxLength,
-            ErrorMessage = GlobalConstants.StringLengthErrorMessage, 
-            MinimumLength = GlobalConstants.UserPasswordMinLength)]
+            maximumLength:WebConstants.UserPasswordMaxLength,
+            ErrorMessage = WebConstants.StringLengthErrorMessage, 
+            MinimumLength = WebConstants.UserPasswordMinLength)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -30,7 +30,7 @@
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
         [Compare("Password", 
-            ErrorMessage = GlobalConstants.PasswordsDontMatchErrorMessage)]
+            ErrorMessage = WebConstants.PasswordsDontMatchErrorMessage)]
         public string ConfirmPassword { get; set; }
 
     }

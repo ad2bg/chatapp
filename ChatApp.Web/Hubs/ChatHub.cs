@@ -174,9 +174,9 @@
             // send youAre
             await Clients.Caller.SendAsync(youAre, myUsername);
             // if no Public room exists -> create it
-            if (!this.roomService.Exists(GlobalConstants.PublicRoomName))
+            if (!this.roomService.Exists(WebConstants.PublicRoomName))
             {
-                await this.roomService.CreateAsync(GlobalConstants.PublicRoomName, null);
+                await this.roomService.CreateAsync(WebConstants.PublicRoomName, null);
             }
             // push rooms
             var rooms = await this.roomService.AllAsync(myUsername);
@@ -210,7 +210,7 @@
             var myUsername = Context.User.Identity.Name;
             var user = await this.userManager.FindByNameAsync(myUsername);
             // add the user as a room member in the DB
-            this.roomService.AddMember(groupName, user);
+            await this.roomService.AddMemberAsync(groupName, user);
             // add the connection to the group
             var connectionId = Context.ConnectionId;
             await Groups.AddToGroupAsync(connectionId, groupName);
@@ -230,7 +230,7 @@
             var myUsername = Context.User.Identity.Name;
             var user = await this.userManager.FindByNameAsync(myUsername);
             // remove the user as a room member in the DB
-            this.roomService.RemoveMember(groupName, user);
+            await this.roomService.RemoveMemberAsync(groupName, user);
             // remove the connection from the group
             var connectionId = Context.ConnectionId;
             await Groups.RemoveFromGroupAsync(connectionId, groupName);

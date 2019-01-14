@@ -11,15 +11,15 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    [Authorize(Roles = GlobalConstants.AdministratorRole)] // can also be like "Administrator,Moderator,Whatever"
+    [Authorize(Roles = WebConstants.AdministratorRole)] // can also be like "Administrator,Moderator,Whatever"
     public class IdentityController : Controller
     {
         private readonly ChatAppDbContext db;
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
 
-        const string successMessage = GlobalConstants.SuccessMessage;
-        const string errorMessage = GlobalConstants.ErrorMessage;
+        const string successMessage = WebConstants.SuccessMessage;
+        const string errorMessage = WebConstants.ErrorMessage;
 
         public IdentityController(
             ChatAppDbContext db,

@@ -15,8 +15,8 @@
 
         Task<IEnumerable<RoomModel>> AllAsync(string userId);
 
-        void AddMember(string groupName, User user);
-        void RemoveMember(string groupName, User user);
+        Task AddMemberAsync(string groupName, User user);
+        Task RemoveMemberAsync(string groupName, User user);
 
         List<User> GetMembers(string groupName);
     }

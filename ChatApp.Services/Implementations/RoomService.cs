@@ -97,7 +97,7 @@
 
 
         // ADD MEMBER
-        public void AddMember(string groupName, User user)
+        public async Task AddMemberAsync(string groupName, User user)
         {
             var room = this.GetByName(groupName);
             if (room == null) { throw new ArgumentException("Invalid room name: " + groupName); }
@@ -106,17 +106,17 @@
             if (members.Contains(user)) { return; }
             var roomMember = new RoomMember { Room = room, Member = user };
             room.RoomMembers.Add(roomMember);
-            this.db.SaveChanges();
+            await this.db.SaveChangesAsync();
         }
 
         // REMOVE MEMBER
-        public void RemoveMember(string groupName, User user)
+        public async Task RemoveMemberAsync(string groupName, User user)
         {
             var room = this.GetByName(groupName);
             if (room == null) { throw new ArgumentException("Invalid room name: " + groupName); }
             if (user == null) { throw new ArgumentException("Invalid user"); }
             room.RoomMembers = room.RoomMembers.Where(rm => rm.Member.Id != user.Id).ToList();
-            this.db.SaveChanges();
+            await this.db.SaveChangesAsync();
         }
 
 

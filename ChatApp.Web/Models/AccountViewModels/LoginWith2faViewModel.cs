@@ -6,7 +6,7 @@
     public class LoginWith2faViewModel
     {
         [Required]
-        [StringLength(7, ErrorMessage = GlobalConstants.StringLengthErrorMessage, MinimumLength = 6)]
+        [StringLength(7, ErrorMessage = WebConstants.StringLengthErrorMessage, MinimumLength = 6)]
         [DataType(DataType.Text)]
         [Display(Name = "Authenticator code")]
         public string TwoFactorCode { get; set; }

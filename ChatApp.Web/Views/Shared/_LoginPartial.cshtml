@@ -13,7 +13,7 @@
         <ul class="nav navbar-nav navbar-right">
 
             @* ADMIN *@
-            @if (User.IsInRole(GlobalConstants.AdministratorRole))
+            @if (User.IsInRole(WebConstants.AdministratorRole))
             {
                 <li class="nav-item">
                     <a class="nav-link text-@Model.NavbarFgColor p-3"

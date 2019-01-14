@@ -19,9 +19,9 @@
         {
             this.stopwatch.Stop();
 
-            using (var writer = new StreamWriter(GlobalConstants.LogMeasureTimeFilename, true))
+            using (var writer = new StreamWriter(WebConstants.LogMeasureTimeFilename, true))
             {
-                var dateTime = DateTime.UtcNow.ToString(GlobalConstants.LogDateTimeFormat, CultureInfo.InvariantCulture);
+                var dateTime = DateTime.UtcNow.ToString(WebConstants.LogDateTimeFormat, CultureInfo.InvariantCulture);
                 var controller = context.RouteData.Values["controller"]; // var controller = context.Controller.GetType().Name;
                 var action = context.RouteData.Values["action"];
                 var elapsedTime = this.stopwatch.Elapsed;

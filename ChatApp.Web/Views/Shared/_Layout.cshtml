@@ -136,18 +136,18 @@
             <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
         </noscript>
 
-        @if (TempData[GlobalConstants.SuccessMessage] != null)
+        @if (TempData[WebConstants.SuccessMessage] != null)
         {
             <h3 class="alert alert-success alert-dismissible text-center shadow fade show my-1">
-                @TempData[GlobalConstants.SuccessMessage]
+                @TempData[WebConstants.SuccessMessage]
                 @Html.Partial("_AlertCloseButton")
             </h3>
         }
 
-        @if (TempData[GlobalConstants.ErrorMessage] != null)
+        @if (TempData[WebConstants.ErrorMessage] != null)
         {
             <h3 class="alert alert-danger alert-dismissible text-center shadow fade show my-1">
-                @TempData[GlobalConstants.ErrorMessage]
+                @TempData[WebConstants.ErrorMessage]
                 @Html.Partial("_AlertCloseButton")
             </h3>
         }

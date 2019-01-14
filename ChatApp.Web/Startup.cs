@@ -111,7 +111,7 @@
                 builder
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .WithOrigins(GlobalConstants.Domain)
+                    .WithOrigins(WebConstants.Domain)
                     .AllowCredentials();
             }));
 

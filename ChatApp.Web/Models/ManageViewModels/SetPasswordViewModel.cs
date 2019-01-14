@@ -7,9 +7,9 @@
     {
         [Required]
         [StringLength(
-            maximumLength: GlobalConstants.UserPasswordMaxLength,
-            MinimumLength = GlobalConstants.UserPasswordMinLength,
-            ErrorMessage = GlobalConstants.StringLengthErrorMessage)]
+            maximumLength: WebConstants.UserPasswordMaxLength,
+            MinimumLength = WebConstants.UserPasswordMinLength,
+            ErrorMessage = WebConstants.StringLengthErrorMessage)]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
         public string NewPassword { get; set; }
@@ -17,7 +17,7 @@
         [DataType(DataType.Password)]
         [Display(Name = "Confirm new password")]
         [Compare("NewPassword", 
-            ErrorMessage = GlobalConstants.PasswordsDontMatchErrorMessage)]
+            ErrorMessage = WebConstants.PasswordsDontMatchErrorMessage)]
         public string ConfirmPassword { get; set; }
 
         public string StatusMessage { get; set; }

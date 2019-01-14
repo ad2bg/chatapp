@@ -14,9 +14,9 @@
             {
                 Task.Run(async () =>
                 {
-                    using (var writer = new StreamWriter(GlobalConstants.LogFilename, true))
+                    using (var writer = new StreamWriter(WebConstants.LogFilename, true))
                     {
-                        var dateTime = DateTime.UtcNow.ToString(GlobalConstants.LogDateTimeFormat, CultureInfo.InvariantCulture);
+                        var dateTime = DateTime.UtcNow.ToString(WebConstants.LogDateTimeFormat, CultureInfo.InvariantCulture);
                         var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
                         var userName = context.HttpContext.User?.Identity?.Name ?? "Anonymous";
                         var controller = context.Controller.GetType().Name; // context.RouteData.Values["controller"]

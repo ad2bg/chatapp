@@ -10,29 +10,37 @@
     {
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            Task.Run(async () =>
+            try
             {
-                using (var writer = new StreamWriter(GlobalConstants.LogFilename, true))
+                Task.Run(async () =>
                 {
-                    var dateTime = DateTime.UtcNow.ToString(GlobalConstants.LogDateTimeFormat, CultureInfo.InvariantCulture);
-                    var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
-                    var userName = context.HttpContext.User?.Identity?.Name ?? "Anonymous";
-                    var controller = context.Controller.GetType().Name; // context.RouteData.Values["controller"]
+                    using (var writer = new StreamWriter(GlobalConstants.LogFilename, true))
+                    {
+                        var dateTime = DateTime.UtcNow.ToString(GlobalConstants.LogDateTimeFormat, CultureInfo.InvariantCulture);
+                        var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
+                        var userName = context.HttpContext.User?.Identity?.Name ?? "Anonymous";
+                        var controller = context.Controller.GetType().Name; // context.RouteData.Values["controller"]
                     var action = context.RouteData.Values["action"];
 
-                    var logMessage = $"{dateTime} – {ipAddress} – {userName} – {controller}.{action}";
-                    if (context.Exception != null)
-                    {
-                        var exceptiontype = context.Exception.GetType().Name;
-                        var exceptionMessage = context.Exception.Message;
-                        logMessage = $"[!]{logMessage} – {exceptiontype} – {exceptionMessage}";
-                    }
+                        var logMessage = $"{dateTime} – {ipAddress} – {userName} – {controller}.{action}";
+                        if (context.Exception != null)
+                        {
+                            var exceptiontype = context.Exception.GetType().Name;
+                            var exceptionMessage = context.Exception.Message;
+                            logMessage = $"[!]{logMessage} – {exceptiontype} – {exceptionMessage}";
+                        }
 
-                    await writer.WriteLineAsync(logMessage);
-                }
-            })
-            .GetAwaiter()
-            .GetResult();
+                        await writer.WriteLineAsync(logMessage);
+                    }
+                })
+                .GetAwaiter()
+                .GetResult();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"ERROR: {e.Message}");
+            }
+
         }
     }
 }

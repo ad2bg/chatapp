@@ -82,20 +82,18 @@
 
 
         // ALL ASYNC
-        public async Task<IEnumerable<RoomModel>> AllAsync(string username)
-        {
-            var rooms = await this.db.Rooms
+        public async Task<IEnumerable<RoomModel>> AllAsync(string username) =>
+            await db.Rooms
                 .Select(r => new RoomModel
                 {
                     Id = r.Id,
                     Name = r.Name,
                     OwnerId = r.OwnerId,
-                    IsMember = r.RoomMembers.Select(m => m.Member.UserName).Contains(username)
+                    MembersCount = r.RoomMembers.Count,
+                    IsMember = r.RoomMembers.Select(m => m.Member.UserName).Contains(username),
                 })
-                .OrderBy(r => r.Name)
                 .ToListAsync();
-            return rooms;
-        }
+
 
 
         // ADD MEMBER

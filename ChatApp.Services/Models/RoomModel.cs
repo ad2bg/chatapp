@@ -11,6 +11,8 @@
 
         public string OwnerId { get; set; }
 
+        public int MembersCount { get; set; }
+
         public bool IsMember { get; set; }
 
         public void ConfigureMapping(AutoMapperProfile profile)

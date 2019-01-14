@@ -24,7 +24,7 @@
         {
             return await this.db.Messages
                 .Where(m => m.Room.Name == groupName)
-                .OrderBy(m => m.TimeSent)
+                .Include(m => m.Sender)
                 .ToListAsync();
         }
 

@@ -20,13 +20,13 @@
         // Client-side methods
         const string getData = "getData";
         const string youAre = "youAre";
+        const string notify = "notify";
         const string userOnline = "userOnline";
         const string userOffline = "userOffline";
-        const string receiveMessage = "receiveMessage";
-        const string notify = "notify";
-        const string refreshRooms = "refreshRooms";
-        const string refreshUsers = "refreshUsers";
-        const string refreshMessages = "refreshMessages";
+        const string pushRooms = "pushRooms";
+        const string pushUsers = "pushUsers";
+        const string pushMessages = "pushMessages";
+        const string pushMessage = "pushMessage";
 
         private readonly UserManager<User> userManager;
         private readonly IUserService userService;
@@ -59,7 +59,7 @@
         {
             try
             {
-                DateTime? now = DateTime.UtcNow;
+                DateTime? now = DateTime.UtcNow; // UTC!
 
                 // get user
                 string myUsername = Context.User.Identity.Name;
@@ -108,7 +108,7 @@
                     }
                     //Clients.All.SendAsync(userOnline, userModel);  //  notify ALL users
 
-                    Console.WriteLine($"Online {myUsername} - {connectionId}");
+                    Console.WriteLine($"ONLINE - {connectionId} - {myUsername}");
                 }
             }
             catch (Exception e)
@@ -132,7 +132,7 @@
                     Task.Delay(disconnectTolerance).ContinueWith(t => GoOffline(myUsername));
                 }
 
-                Console.WriteLine($"Disconnected {myUsername} - {connectionId}");
+                Console.WriteLine($"~~~~~~ - {connectionId} - {myUsername}");
             }
             catch (Exception e)
             {
@@ -161,7 +161,7 @@
             {
                 Console.WriteLine($"Error going offline: {e.Message}");
             }
-            Console.WriteLine($"Offline {username}");
+            Console.WriteLine($"OFFLINE - {username}");
         }
 
 
@@ -171,15 +171,16 @@
         {
             var connectionId = Context.ConnectionId;
             var myUsername = Context.User.Identity.Name;
-
+            // send youAre
             await Clients.Caller.SendAsync(youAre, myUsername);
-
+            // if no Public room exists -> create it
             if (!this.roomService.Exists(GlobalConstants.PublicRoomName))
             {
                 await this.roomService.CreateAsync(GlobalConstants.PublicRoomName, null);
             }
+            // push rooms
             var rooms = await this.roomService.AllAsync(myUsername);
-            await Clients.Caller.SendAsync(refreshRooms, rooms);
+            await Clients.Caller.SendAsync(pushRooms, rooms);
         }
 
         // CREATE ROOM
@@ -202,21 +203,6 @@
             }
         }
 
-        // OPEN ROOM
-        public async Task OpenRoom(string groupName)
-        {
-            string myUsername = Context.User.Identity.Name; // caller username
-
-            // show users
-            var userModels = this.roomService.GetMembers(groupName)
-                .Select(u => GetUserModel(u))
-                .OrderBy(m => m.Username);
-            await Clients.Caller.SendAsync(refreshUsers, userModels.Where(m => m.Username != myUsername));
-
-            // show messages
-            var messages = await this.messageService.AllInRoomAsync(groupName);
-            await Clients.Caller.SendAsync(refreshMessages, messages.Select(m => GetMessageModel(m)));
-        }
 
         // JOIN ROOM
         public async Task JoinRoom(string groupName)
@@ -233,7 +219,7 @@
                 .GetMembers(groupName)
                 .Select(u => GetUserModel(u))
                 .OrderBy(m => m.Username);
-            await Clients.OthersInGroup(groupName).SendAsync(refreshUsers, userModels);
+            await Clients.OthersInGroup(groupName).SendAsync(pushUsers, userModels);
             // getData
             await Clients.Caller.SendAsync(getData);
         }
@@ -250,15 +236,40 @@
             await Groups.RemoveFromGroupAsync(connectionId, groupName);
             // notify all room members
             var userModels = this.roomService.GetMembers(groupName).Select(u => GetUserModel(u));
-            await Clients.Group(groupName).SendAsync(refreshUsers, userModels);
+            await Clients.Group(groupName).SendAsync(pushUsers, userModels);
             // getData
             await Clients.Caller.SendAsync(getData);
         }
 
 
+        // PUSH ALL USERS
+        public async Task PushAllUsers()
+        {
+            var myUsername = Context.User.Identity.Name; // caller username
+            var users = this.userService.All();
+            var userModels = users.Select(u => GetUserModel(u));
+            await Clients.Caller.SendAsync(pushUsers, userModels);
+        }
 
-        // OPEN USER
-        public async Task OpenUser(string username)
+        // PUSH ROOM MEMBERS
+        public async Task PushRoomMembers(string groupName)
+        {
+            var myUsername = Context.User.Identity.Name; // caller username
+            var users = this.roomService.GetMembers(groupName);
+            var userModels = users.Select(u => GetUserModel(u));
+            await Clients.Caller.SendAsync(pushUsers, userModels);
+        }
+
+        // PUSH ROOM MESSAGES
+        public async Task PushRoomMessages(string groupName)
+        {
+            var messages = await this.messageService.AllInRoomAsync(groupName);
+            var messageModels = messages.Select(m => GetMessageModel(m));
+            await Clients.Caller.SendAsync(pushMessages, messageModels);
+        }
+
+        // PUSH USER MESSAGES
+        public async Task PushUserMessages(string username)
         {
             string myUsername = Context.User.Identity.Name; // caller username
             var myself = await this.userManager.FindByNameAsync(myUsername);
@@ -266,8 +277,11 @@
 
             // show messages
             var messages = await this.messageService.AllWithUserAsync(myself.Id, partner.Id);
-            await Clients.Caller.SendAsync(refreshMessages, messages.Select(m => GetMessageModel(m)));
+            await Clients.Caller.SendAsync(pushMessages, messages.Select(m => GetMessageModel(m)));
         }
+
+
+
 
 
 
@@ -282,7 +296,7 @@
             if (myUsername != null)
             {
                 var messageModel = GetMessageModel(message);
-                await Clients.All.SendAsync(receiveMessage, messageModel);
+                await Clients.All.SendAsync(pushMessage, messageModel);
             }
         }
 
@@ -298,8 +312,8 @@
             if (myUsername != null)
             {
                 var messageModel = GetMessageModel(message);
-                await Clients.Caller.SendAsync(receiveMessage, messageModel);
-                await Clients.OthersInGroup(groupName).SendAsync(receiveMessage, messageModel);
+                await Clients.Caller.SendAsync(pushMessage, messageModel);
+                await Clients.OthersInGroup(groupName).SendAsync(pushMessage, messageModel);
             }
         }
 
@@ -316,8 +330,8 @@
             if (myUsername != null && connectionIds.ContainsKey(recipientUsername))
             {
                 var messageModel = GetMessageModel(message);
-                await Clients.Caller.SendAsync(receiveMessage, messageModel);
-                await Clients.Client(connectionIds[recipientUsername]).SendAsync(receiveMessage, messageModel);
+                await Clients.Caller.SendAsync(pushMessage, messageModel);
+                await Clients.Client(connectionIds[recipientUsername]).SendAsync(pushMessage, messageModel);
             }
         }
 
@@ -344,3 +358,4 @@
             };
     }
 }
+

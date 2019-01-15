@@ -4,7 +4,7 @@
     @inject SignInManager<User> SignInManager
     @inject UserManager<User> UserManager*@
 
-@model LoginPartialViewModel
+@model Colors
 
 
 @if (User.Identity.IsAuthenticated)
@@ -15,7 +15,7 @@
         @if (User.IsInRole(WebConstants.AdministratorRole))
         {
             <li class="nav-item">
-                <a class="nav-link text-@Model.NavbarFgColor p-3"
+                <a class="nav-link text-@Model.ForegroundColor p-3"
                    data-toggle="tooltip" title="Admin"
                    asp-area="" asp-controller="Identity" asp-action="All">
                     <i class="fas fa-tools"></i>
@@ -25,7 +25,7 @@
 
         @* USER PROFILE *@
         <li>
-            <a asp-area="" asp-controller="Manage" asp-action="Index" data-toggle="tooltip" title="Manage Your Profile" class="nav-link text-@Model.NavbarFgColor p-3">
+            <a asp-area="" asp-controller="Manage" asp-action="Index" data-toggle="tooltip" title="Manage Your Profile" class="nav-link text-@Model.ForegroundColor p-3">
                 <i class="far fa-user-circle"></i>Hello @User.Identity.Name!
             </a>
         </li>
@@ -33,7 +33,7 @@
         @* LOGOUT *@
         <li>
             <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
-                <button type="submit" class="nav-link w-100 text-left btn bg-@Model.NavbarBgColor text-@Model.NavbarFgColor p-3"
+                <button type="submit" class="nav-link w-100 text-left btn bg-@Model.BackgroundColor text-@Model.ForegroundColor p-3"
                         data-toggle="tooltip" title="Log out">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
@@ -46,11 +46,11 @@ else
     <ul class="nav navbar-nav navbar-right">
         <li>
             <a asp-area="" asp-controller="Account" asp-action="Register"
-               class="nav-link text-@Model.NavbarFgColor p-3"><i class="fas fa-user-plus"></i>Register</a>
+               class="nav-link text-@Model.ForegroundColor p-3"><i class="fas fa-user-plus"></i>Register</a>
         </li>
         <li>
             <a asp-area="" asp-controller="Account" asp-action="Login"
-               class="nav-link text-@Model.NavbarFgColor p-3"><i class="fas fa-sign-in-alt"></i>Log in</a>
+               class="nav-link text-@Model.ForegroundColor p-3"><i class="fas fa-sign-in-alt"></i>Log in</a>
         </li>
     </ul>
 }

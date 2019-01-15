@@ -80,7 +80,6 @@ const chatApp = (() => {
             format = format.replace('lll', pad(milliseconds, 3));
             return format;
         },
-        userCircleSize: 50,
         userUsernamePropertyName: 'username',
         roomModelNamePropertyName: 'name',
     }
@@ -588,7 +587,7 @@ class Users extends React.Component {
 
                     <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', activeRoom ? activeRoom : lastActiveRoom)} data-tip="All Rooms"><ArrowsLeft /> <IconRooms /> <ReactTooltip /> </button>
 
-                    <span data-tip={`Members of room ${activeRoom.name}`}> <ReactTooltip />
+                    <span data-tip={activeRoom ? `Members of room ${activeRoom.name}` : "All Users"}> <ReactTooltip />
                         <button className="btn btn-sm btn-primary" disabled>
                             {activeRoom ? <span><IconUsers /> in <IconRoom /> {activeRoom.name} {SetIconPublic(activeRoom.name)}  </span> : <span><IconAllUsers /> All Users</span>}: {users.length}</button>
                     </span>
@@ -686,7 +685,9 @@ class MessagesList extends React.Component {
             <div id="messagesList" className="p-2">
                 {(filteredMessages.length > 0) &&
                     <div>
-                        {filter.term && <div className="text-center bg-warning p-3 m-5 rounded shadow display-4">Messages containing <br /> '{filter.term}'</div>}
+                        <div data-tip="Case Insensitive!"><ReactTooltip />
+                            {filter.term && <div className="text-center bg-warning p-3 m-5 rounded shadow display-4">Messages containing <br /> '{filter.term}'</div>}
+                        </div>
                         <div>{filteredMessages.map((msg, ix) => <MessageItem key={ix} msg={msg} youAre={youAre} />)}</div>
                     </div>}
                 {(filteredMessages.length == 0)
@@ -708,8 +709,8 @@ class MessageItem extends React.Component {
         return (
             <div>
                 <div className={`my-1 ${justify}`}>
-                    <div className="bg-primary mx-2 px-2 rounded-circle"
-                        style={{ height: userCircleSize, width: userCircleSize, order: (isYou ? 1 : -1) }}>{sender.username}</div>
+                    <div className="bg-primary mx-2 px-2 rounded"
+                        style={{ order: (isYou ? 1 : -1) }}>{sender.username}</div>
                     <div className="bg-warning mx-2 px-2 rounded">{text}</div >
                 </div>
                 <div className={`mt-1 mb-4 ${justify}`}>

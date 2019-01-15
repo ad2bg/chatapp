@@ -1,0 +1,36 @@
+﻿<environment include="Development">
+
+    @* Bootstrap *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+
+    @* Font Awesome *@
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+          crossorigin="anonymous"
+          asp-fallback-href="~/lib/font-awesome/all.css">
+
+    @* Site CSS *@
+    <link rel="stylesheet" href="~/css/site.css" />
+
+</environment>
+
+<environment exclude="Development">
+
+    @* Bootstrap *@
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+          asp-fallback-test-class="sr-only"
+          asp-fallback-test-property="position"
+          asp-fallback-test-value="absolute" />
+
+    @* Font Awesome *@
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+          crossorigin="anonymous"
+          asp-fallback-href="~/lib/font-awesome/all.css">
+
+    @* Site CSS *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+</environment>

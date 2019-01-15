@@ -1,4 +1,4 @@
-﻿@{const string title = "Just Chat";}
+﻿@{ViewData["AppTitle"] = "Just Chat";}
 @{const string navbarBgColor = "dark";}
 @{const string navbarFgColor = "light";}
 
@@ -9,224 +9,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ChatApp</title>
 
-    <environment include="Development">
-
-        @* Bootstrap *@
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-
-        @* Font Awesome *@
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
-              integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
-              crossorigin="anonymous"
-              asp-fallback-href="~/lib/font-awesome/all.css">
-
-        @* Site CSS *@
-        <link rel="stylesheet" href="~/css/site.css" />
-
-    </environment>
-    <environment exclude="Development">
-
-        @* Bootstrap *@
-        <link rel="stylesheet"
-              href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-              asp-fallback-test-class="sr-only"
-              asp-fallback-test-property="position"
-              asp-fallback-test-value="absolute" />
-
-        @* Font Awesome *@
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
-              integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
-              crossorigin="anonymous"
-              asp-fallback-href="~/lib/font-awesome/all.css">
-
-        @* Site CSS *@
-        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
-    </environment>
+    @* STYLES *@
+    @Html.Partial("_Styles")
 </head>
 
 <body class="h-100">
 
     @* HEADER *@
-    <header class="mb-3">
-
-        <nav class="navbar fixed-top navbar-expand-md navbar-@navbarBgColor bg-@navbarBgColor p-0">
-
-            @* LEFT *@
-            @* Button-Left *@
-            <button id="navbar-toggle-left" class="custom-toggler navbar-toggler m-2" type="button"
-                    data-toggle="collapse" data-target=".dual-collapse2">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-                <ul class="navbar-nav mr-auto">
-
-                    @* HOME *@
-                    <li class="nav-item active">
-                        <a class="nav-link text-@navbarFgColor p-3"
-                           data-toggle="tooltip" title="Home"
-                           asp-area="" asp-controller="Home" asp-action="Index">
-                            <i class="fas fa-home"></i>
-                        </a>
-                    </li>
-
-                    @* ABOUT *@
-                    <li class="nav-item">
-                        <a asp-area="" asp-controller="Home" asp-action="About"
-                           data-toggle="tooltip" title="About"
-                           class="nav-link text-@navbarFgColor p-3">
-                            <i class="fas fa-info"></i>
-                        </a>
-                    </li>
-
-
-                    <li class="nav-item">
-                        <a asp-area="" asp-controller="Home" asp-action="Contact"
-                           data-toggle="tooltip" title="Contact"
-                           class="nav-link text-@navbarFgColor p-3">
-                            <i class="fas fa-file-signature"></i>
-                        </a>
-                    </li>
-
-                </ul>
-            </div>
-
-
-            @* CENTER *@
-            <div class="order-0">
-                <a class="navbar-brand mx-auto text-@navbarFgColor p-3"
-                   data-toggle="tooltip"
-                   data-container="body"
-                   title="<strong class='display-3'>Welcome!</strong><br /><span class='display-4 text-primary'>Happy Chatting!</span>"
-                   asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="far fa-comments"></i>
-                    @title.ToUpper()
-                </a>
-            </div>
-
-
-
-            @* RIGHT *@
-            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-                <ul class="navbar-nav ml-auto">
-                    @await Html.PartialAsync("_LoginPartial", new LoginPartialViewModel(navbarBgColor: navbarBgColor, navbarFgColor: navbarFgColor))
-                </ul>
-            </div>
-
-
-            @* Button-Right *@
-            <button id="navbar-toggle-rigth" class="custom-toggler navbar-toggler m-2" type="button"
-                    data-toggle="collapse" data-target=".dual-collapse2">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-        </nav>
-
-        <div class="py-4">&nbsp;</div>
-
-    </header>
+    @Html.Partial("_Header", new Colors(backgroundColor: navbarBgColor, foregroundColor: navbarFgColor))
 
     @* MESSAGES *@
-    <div class="px-1">
-
-        @* NO SCRIPT *@
-        <noscript>
-            <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
-        </noscript>
-
-        @if (TempData[WebConstants.TempDataSuccessMessageKey] != null)
-        {
-            <h3 class="alert alert-success alert-dismissible text-center shadow fade show my-1">
-                @TempData[WebConstants.TempDataSuccessMessageKey]
-                @Html.Partial("_AlertCloseButton")
-            </h3>
-        }
-
-        @if (TempData[WebConstants.TempDataErrorMessageKey] != null)
-        {
-            <h3 class="alert alert-danger alert-dismissible text-center shadow fade show my-1">
-                @TempData[WebConstants.TempDataErrorMessageKey]
-                @Html.Partial("_AlertCloseButton")
-            </h3>
-        }
-    </div>
+    @Html.Partial("_Messages")
 
     @* BODY *@
     <div id="body-container" class="container">@RenderBody()</div>
 
     @* FOOTER *@
-    <div class="py-2">&nbsp;</div>
-    <footer id="main-footer" class="footer fixed-bottom container-fluid bg-@navbarBgColor text-@navbarFgColor">
-        <div class="container text-center"><p>&copy; @DateTime.Now.Year - @title</p></div>
-    </footer>
+    @Html.Partial("_Footer", new Colors(backgroundColor: navbarBgColor, foregroundColor: navbarFgColor))
 
-    
-    @* DEVELOPMENT *@
-    <environment include="Development">
-
-        @* jQuery *@
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-        @* Bootstrap Bundle includes Popper! *@
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
-
-        @* SignalR *@
-        <script src="~/lib/signalr/dist/browser/signalr.js"></script>
-
-        @* Babel *@
-        @*<script src="https://unpkg.com/babel-standalone@6/babel.js"></script>*@
-        @*<script src="~/lib/babel/babel.js"></script>*@
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
-
-        @* React *@
-        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-
-        @* React-Tooltip *@
-        <script src="~/lib/react-tooltip/react-tooltip.js"></script>
-
-        @* Site Custom JS *@
-        <script src="~/js/site.js" asp-append-version="true"></script>
-
-    </environment>
-
-    @* PRODUCTION *@
-    <environment exclude="Development">
-
-        @* jQuery *@
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                asp-fallback-test="window.jQuery"
-                crossorigin="anonymous"
-                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
-        </script>
-        @* Bootstrap Bundle includes Popper! *@
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js"
-                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
-                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
-        </script>
-
-        @* SignalR *@
-        <script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
-
-        @* Babel *@
-        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-
-        @* React *@
-        <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
-
-        @* React-Tooltip *@
-        <script src="~/lib/react-tooltip/react-tooltip.min.js"></script>
-
-        @* Site Custom JS *@
-        <script src="~/js/site.min.js" asp-append-version="true"></script>
-    </environment>
-
-    @* React *@
-    <script type="text/babel" src="~/js/react.js"></script>
-
+    @* SCRIPTS *@
+    @Html.Partial("_Scripts")
     @RenderSection("Scripts", required: false)
+
 </body>
 </html>

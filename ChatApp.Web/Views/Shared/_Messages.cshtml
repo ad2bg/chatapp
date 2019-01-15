@@ -1,0 +1,23 @@
+﻿<div class="px-1">
+
+    @* NO SCRIPT *@
+    <noscript>
+        <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
+    </noscript>
+
+    @if (TempData[WebConstants.TempDataSuccessMessageKey] != null)
+    {
+        <h3 class="alert alert-success alert-dismissible text-center shadow fade show my-1">
+            @TempData[WebConstants.TempDataSuccessMessageKey]
+            @Html.Partial("_AlertCloseButton")
+        </h3>
+    }
+
+    @if (TempData[WebConstants.TempDataErrorMessageKey] != null)
+    {
+        <h3 class="alert alert-danger alert-dismissible text-center shadow fade show my-1">
+            @TempData[WebConstants.TempDataErrorMessageKey]
+            @Html.Partial("_AlertCloseButton")
+        </h3>
+    }
+</div>

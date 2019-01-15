@@ -1,0 +1,80 @@
+﻿@model Colors
+
+<header class="mb-3">
+
+    <nav class="navbar fixed-top navbar-expand-md navbar-@Model.BackgroundColor bg-@Model.BackgroundColor p-0">
+
+        @* LEFT *@
+        @* Button-Left *@
+        <button id="navbar-toggle-left" class="custom-toggler navbar-toggler m-2" type="button"
+                data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+            <ul class="navbar-nav mr-auto">
+
+                @* HOME *@
+                <li class="nav-item active">
+                    <a class="nav-link text-@Model.ForegroundColor p-3"
+                       data-toggle="tooltip" title="Home"
+                       asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-home"></i>
+                    </a>
+                </li>
+
+                @* ABOUT *@
+                <li class="nav-item">
+                    <a asp-area="" asp-controller="Home" asp-action="About"
+                       data-toggle="tooltip" title="About"
+                       class="nav-link text-@Model.ForegroundColor p-3">
+                        <i class="fas fa-info"></i>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a asp-area="" asp-controller="Home" asp-action="Contact"
+                       data-toggle="tooltip" title="Contact"
+                       class="nav-link text-@Model.ForegroundColor p-3">
+                        <i class="fas fa-file-signature"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        @* CENTER *@
+        <div class="order-0">
+            <a class="navbar-brand mx-auto text-@Model.ForegroundColor p-3"
+               data-toggle="tooltip"
+               data-container="body"
+               title="<strong class='display-3'>Welcome!</strong><br /><span class='display-4 text-primary'>Happy Chatting!</span>"
+               asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="far fa-comments"></i>
+                @ViewData["AppTitle"].ToString().ToUpper()
+            </a>
+        </div>
+
+
+
+        @* RIGHT *@
+        <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+            <ul class="navbar-nav ml-auto">
+                @await Html.PartialAsync("_LoginPartial", new Colors(backgroundColor: Model.BackgroundColor, foregroundColor: Model.ForegroundColor))
+            </ul>
+        </div>
+
+
+        @* Button-Right *@
+        <button id="navbar-toggle-rigth" class="custom-toggler navbar-toggler m-2" type="button"
+                data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+    </nav>
+
+    <div class="py-4">&nbsp;</div>
+
+</header>

@@ -12,6 +12,7 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+
     [MeasureTime]
     public class ChatHub : Hub
     {
@@ -38,7 +39,6 @@
         private static Dictionary<string, string> connectionIds = new Dictionary<string, string>(); // username => connectionId
         private static Dictionary<string, string> disconnected = new Dictionary<string, string>();  // username => connectionId
 
-
         public ChatHub(
             UserManager<User> userManager,
             IUserService userService,
@@ -54,6 +54,10 @@
 
 
         // CONNECTED ASYNC
+        /// <summary>
+        /// This method is run when a connection with a client is established.
+        /// </summary>
+        /// <returns></returns>
         public override async Task OnConnectedAsync()
         {
             try
@@ -115,6 +119,15 @@
         }
 
         // DISCONNECTED ASYNC
+        /// <summary>
+        /// This is run when a connection with a client is lost.
+        /// The method does not immediately mark the user as offline,
+        /// but rather schedules another method (GoOfflineAsync) to do that
+        /// after a certain time (disconnectTolerance) elapses.
+        /// This prevents the users going offline due to small interruptions in the connection.
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <returns></returns>
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             try
@@ -138,6 +151,11 @@
         }
 
         // go offline async
+        /// <summary>
+        /// Marks a user as oflline a certain time (disconnectTolerance) after a connection is lost.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         private async Task GoOfflineAsync(string username)
         {
             if (username == null) { return; }
@@ -163,6 +181,10 @@
 
 
         // GET DATA ASYNC
+        /// <summary>
+        /// Pushes the user's username and the list of rooms to the connected user.
+        /// </summary>
+        /// <returns></returns>
         public async Task GetDataAsync()
         {
             try
@@ -189,6 +211,11 @@
 
 
         // CREATE ROOM ASYNC
+        /// <summary>
+        /// Creates a new chat room.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         public async Task CreateRoomAsync(string groupName)
         {
             var connectionId = Context.ConnectionId;
@@ -210,6 +237,11 @@
 
 
         // JOIN ROOM ASYNC
+        /// <summary>
+        /// The user joins a chat room.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         public async Task JoinRoomAsync(string groupName)
         {
             try
@@ -235,6 +267,11 @@
         }
 
         // LEAVE ROOM ASYNC
+        /// <summary>
+        /// The user leaves a chat room.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         public async Task LeaveRoomAsync(string groupName)
         {
             try
@@ -261,6 +298,10 @@
 
 
         // PUSH ALL USERS ASYNC
+        /// <summary>
+        /// Pushes to the connected client a list of ALL users
+        /// </summary>
+        /// <returns></returns>
         public async Task PushAllUsersAsync()
         {
             try
@@ -277,6 +318,11 @@
         }
 
         // PUSH ROOM MEMBERS ASYNC
+        /// <summary>
+        /// Pushes to the connected client a list of the members of a given room
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         public async Task PushRoomMembersAsync(string groupName)
         {
             try
@@ -293,6 +339,11 @@
         }
 
         // PUSH ROOM MESSAGES ASYNC
+        /// <summary>
+        /// Pushes to the connected client a list of the messages in a given room
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         public async Task PushRoomMessagesAsync(string groupName)
         {
             try
@@ -308,6 +359,11 @@
         }
 
         // PUSH USER MESSAGES ASYNC
+        /// <summary>
+        /// Puches to the connected client a list of the messages between himself and another given user.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         public async Task PushUserMessagesAsync(string username)
         {
             try
@@ -329,6 +385,13 @@
 
 
         // SEND PUBLIC MESSAGE ASYNC
+        /// <summary>
+        /// Sends a public message.
+        /// This method is added just for illustration.
+        /// It is not actually used, because we have a public chat room where all users may join if they wish.
+        /// </summary>
+        /// <param name="messageText"></param>
+        /// <returns></returns>
         public async Task SendPublicMessageAsync(string messageText)
         {
             try
@@ -350,6 +413,12 @@
         }
 
         // SEND MESSAGE TO GROUP ASYNC
+        /// <summary>
+        /// Sends a message to a given chat room.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="messageText"></param>
+        /// <returns></returns>
         public async Task SendMessageToGroupAsync(string groupName, string messageText)
         {
             try
@@ -372,6 +441,12 @@
         }
 
         // SEND PRIVATE MESSAGE ASYNC
+        /// <summary>
+        /// Sends a private message to another user.
+        /// </summary>
+        /// <param name="recipientUsername"></param>
+        /// <param name="messageText"></param>
+        /// <returns></returns>
         public async Task SendPrivateMessageAsync(string recipientUsername, string messageText)
         {
             try

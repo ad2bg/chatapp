@@ -27,13 +27,13 @@
             <th>@user.UserName</th>
             <th>@user.Email</th>
             <th>
-                <a asp-action="Roles" asp-route-id="@user.Id" class="btn btn-primary" title="Roles">
+                <a asp-action="Roles" asp-route-id="@user.Id" class="btn btn-primary" data-toggle="tooltip" title="Roles">
                     <i class="fas fa-users-cog"></i>
                 </a>
-                <a asp-action="ChangePassword" asp-route-id="@user.Id" class="btn btn-warning" title="Change Password">
+                <a asp-action="ChangePassword" asp-route-id="@user.Id" class="btn btn-warning" data-toggle="tooltip" title="Change Password">
                     <i class="fas fa-key"></i>
                 </a>
-                <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger" title="Delete">
+                <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger" data-toggle="tooltip" title="Delete">
                     <i class="fas fa-trash-alt"></i>
                 </a>
             </th>

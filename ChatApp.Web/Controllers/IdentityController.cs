@@ -10,6 +10,7 @@
     using Microsoft.AspNetCore.Mvc.Rendering;
     using System.Linq;
     using System.Threading.Tasks;
+    using ChatApp.Web.Infrastructure.Extensions;
 
     [Authorize(Roles = WebConstants.AdministratorRole)] // can also be like "Administrator,Moderator,Whatever"
     public class IdentityController : Controller
@@ -18,8 +19,8 @@
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
 
-        const string successMessage = WebConstants.SuccessMessage;
-        const string errorMessage = WebConstants.ErrorMessage;
+        const string successMessage = WebConstants.TempDataSuccessMessageKey;
+        const string errorMessage = WebConstants.TempDataErrorMessageKey;
 
         public IdentityController(
             ChatAppDbContext db,
@@ -94,7 +95,7 @@
 
             if (result.Succeeded)
             {
-                TempData[successMessage] = $"User with email {model.Email} created.";
+                TempData.AddSuccessMessage($"User with email {model.Email} created.");
                 return RedirectToAction(nameof(All));
             }
             else
@@ -143,7 +144,7 @@
 
             if (result.Succeeded)
             {
-                TempData[successMessage] = $"Password changed for user {user.Email}";
+                TempData.AddSuccessMessage($"Password changed for user {user.Email}");
                 return RedirectToAction(nameof(All));
             }
             else
@@ -185,12 +186,12 @@
 
             if (result.Succeeded)
             {
-                TempData[successMessage] = $"User {user.Email} deleted.";
+                TempData.AddSuccessMessage( $"User {user.Email} deleted.");
                 return RedirectToAction(nameof(All));
             }
             else
             {
-                TempData[errorMessage] = $"Error deleting user with email {user.Email}!";
+                TempData.AddErrorMessage( $"Error deleting user with email {user.Email}!");
                 return RedirectToAction(nameof(All));
             }
         }
@@ -232,12 +233,12 @@
             var result = await this.userManager.AddToRoleAsync(user, role);
             if (result.Succeeded)
             {
-                TempData[successMessage] = $"User {user.Email} added to {role} role.";
+                TempData.AddSuccessMessage( $"User {user.Email} added to {role} role.");
                 return RedirectToAction(nameof(Roles), new { id = user.Id });
             }
             else
             {
-                TempData[errorMessage] = $"Error adding user {user.Email} to {role} role!";
+                TempData.AddErrorMessage( $"Error adding user {user.Email} to {role} role!");
                 return RedirectToAction(nameof(Roles), new { id = user.Id });
             }
         }

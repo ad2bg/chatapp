@@ -99,7 +99,7 @@
                 <a class="navbar-brand mx-auto text-@navbarFgColor p-3"
                    data-toggle="tooltip"
                    data-container="body"
-                   title=""
+                   title="<strong class='display-3'>Welcome!</strong><br /><span class='display-4 text-primary'>Happy Chatting!</span>"
                    asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="far fa-comments"></i>
                     @title.ToUpper()
@@ -136,18 +136,18 @@
             <div class="jumbotron"><h1>You need to enable Javascript to use this app!</h1> </div>
         </noscript>
 
-        @if (TempData[WebConstants.SuccessMessage] != null)
+        @if (TempData[WebConstants.TempDataSuccessMessageKey] != null)
         {
             <h3 class="alert alert-success alert-dismissible text-center shadow fade show my-1">
-                @TempData[WebConstants.SuccessMessage]
+                @TempData[WebConstants.TempDataSuccessMessageKey]
                 @Html.Partial("_AlertCloseButton")
             </h3>
         }
 
-        @if (TempData[WebConstants.ErrorMessage] != null)
+        @if (TempData[WebConstants.TempDataErrorMessageKey] != null)
         {
             <h3 class="alert alert-danger alert-dismissible text-center shadow fade show my-1">
-                @TempData[WebConstants.ErrorMessage]
+                @TempData[WebConstants.TempDataErrorMessageKey]
                 @Html.Partial("_AlertCloseButton")
             </h3>
         }
@@ -183,6 +183,9 @@
         <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
 
+        @* React-Tooltip *@
+        <script src="~/lib/react-tooltip/react-tooltip.js"></script>
+
         @* Site Custom JS *@
         <script src="~/js/site.js" asp-append-version="true"></script>
 
@@ -213,6 +216,9 @@
         @* React *@
         <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+
+        @* React-Tooltip *@
+        <script src="~/lib/react-tooltip/react-tooltip.min.js"></script>
 
         @* Site Custom JS *@
         <script src="~/js/site.min.js" asp-append-version="true"></script>

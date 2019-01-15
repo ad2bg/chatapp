@@ -9,8 +9,8 @@
         public const string LogFilename = "log.txt";
         public const string LogMeasureTimeFilename = "action-times.txt";
         public const string LogDateTimeFormat = "yyyy/MM/dd hh:mm:ss.fff";
-        public const string SuccessMessage = "SuccessMessage";
-        public const string ErrorMessage = "ErrorMessage";
+        public const string TempDataSuccessMessageKey = "SuccessMessage";
+        public const string TempDataErrorMessageKey = "ErrorMessage";
         public const string StringLengthErrorMessage = "The {0} must be at least {2} and at max {1} characters long.";
         public const string PasswordsDontMatchErrorMessage = "The password and confirmation password do not match.";
         public const int UserUsernameMinLength = 1;

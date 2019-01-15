@@ -414,6 +414,7 @@ class App extends React.Component {
                         setPage={this.setPage}
                     />}
 
+
             </div>
         );
     }
@@ -433,13 +434,19 @@ class Rooms extends React.Component {
             <div className="col h-100 text-center bg-warning border p-0">
 
                 <div className="bg-dark text-center border-bottom p-2 my-0">
-                    <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('AllUsers')}><ArrowsLeft /> All <IconAllUsers /></button>
+                    <span data-tip="All Users"><ReactTooltip />
+                        <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('AllUsers')}><ArrowsLeft /> All <IconAllUsers /></button>
+                    </span>
 
-                    <button className="btn btn-sm btn-primary" disabled><IconRooms /> : {rooms.length}</button>
+                    <span data-tip="Total Rooms"><ReactTooltip />
+                        <button className="btn btn-sm btn-primary" disabled><IconRooms /> : {rooms.length}</button>
+                    </span>
 
-                    <button className="btn btn-sm btn-primary float-right" onClick={() => activeRoom ? setPage('Chat', activeRoom, null) : setPage('Chat', null, activeUser)}>
-                        {activeRoom ? <span> <IconRoom /> {activeRoom.name} {SetIconPublic(activeRoom.name)}</span> : <span> <IconUser />  User: {activeUser.username}  </span>} <ArrowsRight />
-                    </button>
+                    <span data-tip={activeRoom ? 'Room' : 'User'}><ReactTooltip />
+                        <button className="btn btn-sm btn-primary float-right" onClick={() => activeRoom ? setPage('Chat', activeRoom, null) : setPage('Chat', null, activeUser)}>
+                            {activeRoom ? <span> <IconRoom /> {activeRoom.name} {SetIconPublic(activeRoom.name)}</span> : <span> <IconUser /> : {activeUser.username}  </span>} <ArrowsRight />
+                        </button>
+                    </span>
                 </div>
 
                 <RoomsList rooms={rooms} activeRoom={activeRoom} onJoin={onJoin} onLeave={onLeave} setPage={setPage} />
@@ -479,26 +486,29 @@ class RoomItem extends React.Component {
         return (
             <div className="bg-secondary d-flex p-1 my-2 rounded border shadow">
 
-                { // Room button
+                { /* Room button */}
+                <span data-tip data-for={'room-button-' + room.id}>
                     <button className={`btn btn-sm btn-${(activeRoom && name === activeRoom.name) ? 'primary' : (isMember ? 'success' : 'danger')} mx-1 px-2 rounded`}
-                        datatoggle="tooltip" title={(activeRoom && name === activeRoom.name) ? 'This is your current room.' : (isMember ? 'Chat!' : 'You need to join the room.')}
-                        disabled={!isMember} onClick={() => setPage('Chat', room, null)} >
-                        <IconRoom /> {name} {SetIconPublic(name)}
-                    </button>
-                }
+                        disabled={!isMember} onClick={() => setPage('Chat', room, null)}> <IconRoom /> {name} {SetIconPublic(name)}</button>
+                    <ReactTooltip id={'room-button-' + room.id}>
+                        {(activeRoom && activeRoom.name === name) ? 'This is your current room.' : (isMember ? 'Chat!' : 'You need to join the room.')}
+                    </ReactTooltip>
+                </span>
 
-                { // Members button
+                { /* Members button */}
+                <span data-tip data-for={'members-button-' + room.id}>
                     <button className={`btn btn-sm btn-${(activeRoom && name === activeRoom.name) ? 'primary' : (isMember ? 'success' : 'danger')} mx-1 px-2 rounded`}
-                        datatoggle="tooltip" title={isMember ? 'See Room Members' : 'You need to join the room.'}
                         disabled={!isMember} onClick={() => setPage('Users', room, null)} ><IconUsers />: {membersCount} </button>
-                }
+                    <ReactTooltip id={'members-button-' + room.id}>
+                        {isMember ? 'See Room Members' : 'You need to join the room.'}
+                    </ReactTooltip>
+                </span>
 
-                { // Join / Leave button
-                    <div className="ml-auto">
-                        {!isMember && <JoinLeaveButton isMember={false} roomName={name} onClick={this.onJoin} />}
-                        {isMember && <JoinLeaveButton isMember={true} roomName={name} onClick={this.onLeave} />}
-                    </div>
-                }
+                { /* Join / Leave button */}
+                <div className="ml-auto">
+                    {!isMember && <JoinLeaveButton isMember={false} room={room} onClick={this.onJoin} />}
+                    {isMember && <JoinLeaveButton isMember={true} room={room} onClick={this.onLeave} />}
+                </div>
 
             </div >
         )
@@ -508,14 +518,15 @@ class RoomItem extends React.Component {
 // JOIN/LEAVE BUTTON
 class JoinLeaveButton extends React.Component {
     render() {
-        const { isMember, roomName, onClick } = this.props;
+        const { isMember, room, onClick } = this.props;
+        const { id, name } = room;
         return (
-            <form>
-                <input type="hidden" name="roomName" value={roomName} />
-                <button className={`btn btn-sm btn-outline-${!isMember ? 'success' : 'danger'} mx-1 px-2 rounded`}
-                    datatoggle="tooltip" title={!isMember ? 'Join' : 'Leave'} onClick={onClick}>
+            <form data-tip data-for={'join-leave-' + id}>
+                <input type="hidden" name="roomName" value={name} />
+                <button className={`btn btn-sm btn-outline-${!isMember ? 'success' : 'danger'} mx-1 px-2 rounded`} onClick={onClick}>
                     <i className={`fas fa-sign-${!isMember ? 'in' : 'out'}-alt`}></i>
                 </button>
+                <ReactTooltip id={'join-leave-' + id}>{!isMember ? 'Join' : 'Leave'}</ReactTooltip>
             </form>
         )
     }
@@ -553,7 +564,8 @@ class CreateRoom extends React.Component {
                     onChange={this.onChange}
                 />
 
-                <button type="submit" className="btn btn-primary mx-1" title="Create Room"><IconAdd /></button>
+                <button type="submit" className="btn btn-primary mx-1" data-tip="Create Room"><IconAdd /></button>
+                <ReactTooltip />
             </form>
         )
     }
@@ -573,11 +585,16 @@ class Users extends React.Component {
         return (
             <div className="col h-100 bg-secondary border p-0">
                 <div className=" bg-dark text-center border-bottom p-2 my-0">
-                    <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', activeRoom ? activeRoom : lastActiveRoom)}><ArrowsLeft /> <IconRooms /></button>
 
-                    <button className="btn btn-sm btn-primary" disabled>
-                        {activeRoom ? <span><IconUsers /> in <IconRoom /> {activeRoom.name} {SetIconPublic(activeRoom.name)}  </span> : <span><IconAllUsers /> All Users</span>}: {users.length}</button>
-                    <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Chat', activeRoom ? activeRoom : lastActiveRoom)}><IconMessages /> <ArrowsRight /></button>
+                    <button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', activeRoom ? activeRoom : lastActiveRoom)} data-tip="All Rooms"><ArrowsLeft /> <IconRooms /> <ReactTooltip /> </button>
+
+                    <span data-tip={`Members of room ${activeRoom.name}`}> <ReactTooltip />
+                        <button className="btn btn-sm btn-primary" disabled>
+                            {activeRoom ? <span><IconUsers /> in <IconRoom /> {activeRoom.name} {SetIconPublic(activeRoom.name)}  </span> : <span><IconAllUsers /> All Users</span>}: {users.length}</button>
+                    </span>
+
+                    <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Chat', activeRoom ? activeRoom : lastActiveRoom)} data-tip="Chat"><IconMessages /> <ArrowsRight /> <ReactTooltip /> </button>
+
                 </div>
 
                 <UsersList users={users} setPage={setPage} />
@@ -607,7 +624,7 @@ class UserItem extends React.Component {
         const { username, isOnline, onlineAtUTC } = user;
         return (
             <div className="my-1 d-flex">
-                <button className={`btn btn-${isOnline ? 'success' : 'danger'} mx-2 px-2 rounded`} onClick={() => setPage('Chat', null, user)}><IconUser /> {username}</button>
+                <button className={`btn btn-${isOnline ? 'success' : 'danger'} mx-2 px-2 rounded`} onClick={() => setPage('Chat', null, user)}><IconUser /> {username} </button>
                 {isOnline && <div className="bg-warning mx-2 px-2 rounded ml-auto">Online: {formatDate(new Date(onlineAtUTC), formatTimeShort)}</div >}
             </div>
         )
@@ -640,16 +657,16 @@ class Messages extends React.Component {
                 <div className="bg-dark text-center border-bottom p-2 my-0">
 
                     {/* << Rooms button */}
-                    {<button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', room)}><ArrowsLeft /> <IconRooms /></button>}
-
+                    <span data-tip="All Rooms"><ReactTooltip />
+                        {<button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', room)}><ArrowsLeft /> <IconRooms /></button>}
+                    </span>
                     {/* Room / User */}
-                    {activeRoom && <button disabled className="btn btn-sm btn-primary"><IconRoom /> {room.name}</button>}
-                    {activeUser && <button disabled className={`btn btn-sm btn-${activeUser.isOnline ? 'success' : 'danger'}`}><IconUser /> User: {activeUser.username}</button>}
+                    {activeRoom && <span data-tip="Room"><ReactTooltip /><button disabled className="btn btn-sm btn-primary"><IconRoom /> {room.name}</button></span>}
+                    {activeUser && <span data-tip="User"><ReactTooltip /><button disabled className={`btn btn-sm btn-${activeUser.isOnline ? 'success' : 'danger'}`}><IconUser /> User: {activeUser.username}</button></span>}
 
                     {/* button Members >>  */}
-                    {<button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Users', room)}>
-                        <IconUsers /> <ArrowsRight />
-                    </button>}
+                    <span data-tip="Room Members"><ReactTooltip />
+                        <button className="btn btn-sm btn-primary float-right" onClick={() => setPage('Users', room)}> <IconUsers /> <ArrowsRight /></button></span>
 
                 </div>
 
@@ -720,10 +737,8 @@ class MessagesFooter extends React.Component {
         const { sendMessage, filter } = this.props;
         return (
             <div className="w-100 bg-dark border-top d-flex py-2">
-                {!showFilter
-                    ? <div className="d-flex w-100"><button className="btn btn-sm btn-warning mx-1" title="Toggle Filter" onClick={() => this.onToggle()}><IconToggleOff /></button> <SendMessage ref="sendMessage" sendMessage={sendMessage} /></div>
-                    : <div className="d-flex w-100"><button className="btn btn-sm btn-warning mx-1" title="Toggle Filter" onClick={() => this.onToggle()}><IconToggleOn /></button> <FilterMessages filter={filter} /></div>
-                }
+                <ToggleButton classes="btn btn btn-warning mx-1" onOff={showFilter} onClick={() => this.onToggle()} dataTip="Toggle Filter" />
+                {!showFilter ? <SendMessage ref="sendMessage" sendMessage={sendMessage} /> : <FilterMessages filter={filter} />}
             </div>
         )
     }
@@ -766,7 +781,7 @@ class SendMessage extends React.Component {
                     onChange={this.onChange}
                 />
 
-                <button type="submit" className="btn btn-primary mx-1" title="Send"><IconSend /></button>
+                <button type="submit" className="btn btn-primary mx-1" data-tip="Send"><IconSend /></button><ReactTooltip />
             </form>
         )
     }
@@ -795,7 +810,7 @@ class FilterMessages extends React.Component {
                     onChange={change}
                 />
 
-                <button type="submit" className="btn btn-sm btn-primary mx-1" title="Filter"><IconClearFilter /></button>
+                <button type="submit" className="btn btn-sm btn-primary mx-1" data-tip="Filter"><IconClearFilter /></button> <ReactTooltip />
 
             </form>
         )
@@ -814,13 +829,19 @@ const IconUser = () => <i className="far fa-user"></i>;
 const IconUsers = () => <i className="fas fa-user-friends"></i>;
 const IconMessages = () => <i className="far fa-comments"></i>;
 const IconMessage = () => <i className="far fa-comment"></i>;
-const IconSend = () => <i className="far fa-share-square"></i>;
 const IconAdd = () => <i className="fas fa-plus"></i>;
-const IconToggleOn = () => <i className="fas fa-toggle-on"></i>;
-const IconToggleOff = () => <i className="fas fa-toggle-off"></i>;
+const IconSend = () => <i className="far fa-share-square"></i>;
+
 const IconClearFilter = () => < span className="fa-stack" > <i className="fa fa-filter fa-stack-1x"></i> <i className="fa fa-ban fa-stack-2x text-danger"></i></span>;
 const IconGithub = () => < i className="fab fa-github" ></i>;
 
+const IconToggleOn = () => <i className="fas fa-toggle-on"></i>;
+const IconToggleOff = () => <i className="fas fa-toggle-off"></i>;
+const ToggleButton = (props) =>
+    <span>
+        <ReactTooltip />
+        <button className={props.classes} onClick={props.onClick} data-tip={props.dataTip}>{props.onOff ? <IconToggleOn /> : <IconToggleOff />}</button>
+    </span>;
 
 const domContainer = document.querySelector('#root');
 if (domContainer) { ReactDOM.render(<App />, domContainer); }

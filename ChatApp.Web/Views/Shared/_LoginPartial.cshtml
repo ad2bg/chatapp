@@ -26,7 +26,7 @@
 
             @* USER PROFILE *@
             <li>
-                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage Your Profile" class="nav-link text-@Model.NavbarFgColor p-3">
+                <a asp-area="" asp-controller="Manage" asp-action="Index" data-toggle="tooltip" title="Manage Your Profile" class="nav-link text-@Model.NavbarFgColor p-3">
                     <i class="far fa-user-circle"></i>Hello @User.Identity.Name!
                 </a>
             </li>

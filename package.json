@@ -13,7 +13,8 @@
   "dependencies": {
     "@aspnet/signalr": "^1.1.0",
     "babel-cli": "^6.26.0",
-    "babel-preset-react-app": "^3.1.2"
+    "babel-preset-react-app": "^3.1.2",
+    "react-tooltip": "^3.9.2"
   },
   "devDependencies": {
     "node-sass": "^4.11.0"

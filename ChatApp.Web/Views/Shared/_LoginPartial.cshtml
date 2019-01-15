@@ -9,37 +9,37 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
-        <ul class="nav navbar-nav navbar-right">
+    <ul class="nav navbar-nav navbar-right">
 
-            @* ADMIN *@
-            @if (User.IsInRole(WebConstants.AdministratorRole))
-            {
-                <li class="nav-item">
-                    <a class="nav-link text-@Model.NavbarFgColor p-3"
-                       data-toggle="tooltip" title="Admin"
-                       asp-area="" asp-controller="Identity" asp-action="All">
-                        <i class="fas fa-tools"></i>
-                    </a>
-                </li>
-            }
-
-            @* USER PROFILE *@
-            <li>
-                <a asp-area="" asp-controller="Manage" asp-action="Index" data-toggle="tooltip" title="Manage Your Profile" class="nav-link text-@Model.NavbarFgColor p-3">
-                    <i class="far fa-user-circle"></i>Hello @User.Identity.Name!
+        @* ADMIN *@
+        @if (User.IsInRole(WebConstants.AdministratorRole))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-@Model.NavbarFgColor p-3"
+                   data-toggle="tooltip" title="Admin"
+                   asp-area="" asp-controller="Identity" asp-action="All">
+                    <i class="fas fa-tools"></i>
                 </a>
             </li>
+        }
 
-            @* LOGOUT *@
-            <li>
-                <button type="submit" class="nav-link btn bg-@Model.NavbarBgColor text-@Model.NavbarFgColor p-3"
+        @* USER PROFILE *@
+        <li>
+            <a asp-area="" asp-controller="Manage" asp-action="Index" data-toggle="tooltip" title="Manage Your Profile" class="nav-link text-@Model.NavbarFgColor p-3">
+                <i class="far fa-user-circle"></i>Hello @User.Identity.Name!
+            </a>
+        </li>
+
+        @* LOGOUT *@
+        <li>
+            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
+                <button type="submit" class="nav-link w-100 text-left btn bg-@Model.NavbarBgColor text-@Model.NavbarFgColor p-3"
                         data-toggle="tooltip" title="Log out">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
-            </li>
-        </ul>
-    </form>
+            </form>
+        </li>
+    </ul>
 }
 else
 {

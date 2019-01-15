@@ -681,16 +681,15 @@ class Messages extends React.Component {
 class MessagesList extends React.Component {
     render() {
         const { messages, filter, youAre } = this.props;
-        console.log(filter.term);
-        let msgs = messages.filter(m => m.text.includes(filter.term));
+        const filteredMessages = messages.filter(m => m.text.toLowerCase().includes(filter.term.toLowerCase()));
         return (
             <div id="messagesList" className="p-2">
-                {(msgs.length > 0) &&
+                {(filteredMessages.length > 0) &&
                     <div>
                         {filter.term && <div className="text-center bg-warning p-3 m-5 rounded shadow display-4">Messages containing <br /> '{filter.term}'</div>}
-                        <div>{msgs.map((msg, ix) => <MessageItem key={ix} msg={msg} youAre={youAre} />)}</div>
+                        <div>{filteredMessages.map((msg, ix) => <MessageItem key={ix} msg={msg} youAre={youAre} />)}</div>
                     </div>}
-                {(msgs.length == 0)
+                {(filteredMessages.length == 0)
                     && <div className="text-center bg-warning p-3 mx-3 my-5 rounded shadow display-4">No Messages {filter.term ? <span><br />containing '{filter.term}'</span> : ''}</div>}
             </div>
         )

@@ -21,7 +21,7 @@ body {
   overflow-y: scroll; }
 
 /*Hide bullet points on list items in divs with this class*/
-.list-style-none li, li {
+.list-style-none li {
   list-style: none; }
 
 /* .user-photo */
@@ -168,3 +168,6 @@ body {
   .remove-image:active {
     border: 0;
     transition: all .2s ease; }
+
+#about ol {
+  list-style-type: decimal; }

@@ -9,7 +9,7 @@ $(function () {
     setTimeout(function () { $(".alert").alert('close'); }, alertsDurationInSeconds * 1000);
 
     // ENABLE ALL TOOLTIPS
-    $('[data-toggle="tooltip"], [datatoggle="tooltip"]')
+    $('[data-toggle="tooltip"]')
         .tooltip({
             html: true, animation: true,
             template: '<div class="tooltip" role="tooltip"><div class="arrow"></div>' +

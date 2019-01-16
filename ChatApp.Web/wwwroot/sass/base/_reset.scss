@@ -12,11 +12,9 @@ body {
     height: 100%;
 }
 
-
 #body-container {
     height: calc(100% - 8em);
 }
-
 
 #roomsList, #messagesList {
     height: calc(100% - 6.4em);
@@ -26,38 +24,4 @@ body {
 #usersList {
     height: calc(100% - 2.9em);
     overflow-y: scroll;
-}
-
-
-
-/*Hide bullet points on list items in divs with this class*/
-.list-style-none li {
-    list-style: none;
-}
-
-/* .user-photo */
-.user-photo {
-  transition: all .2s ease-in-out;
-  &:hover {
-    transform: scale(1.1);
-  }
-}
-
-/* .hover-scale */
-.hover-scale {
-  transition: all .5s ease-in-out;
-  &:hover {
-    transform: scale(1.05);
-  }
-}
-
-//
-//body#body-enlarge-image > div.container-fluid:first-of-type {
-//  border: 1px solid red;
-//  min-height: 100%;
-//}
-
-
-.tooltip-inner {
-  max-width: 100% !important;
 }

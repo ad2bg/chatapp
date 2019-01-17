@@ -28,6 +28,7 @@
         const string pushUsers = "pushUsers";
         const string pushMessages = "pushMessages";
         const string pushMessage = "pushMessage";
+        const string pushTyping = "pushTyping";
 
         private readonly UserManager<User> userManager;
         private readonly IUserService userService;
@@ -469,6 +470,73 @@
                 await LogError(e);
             }
         }
+
+
+
+        // TYPING PUBLIC ASYNC
+        /// <summary>
+        /// Notifies all users that someone is typing 
+        /// This method is added just for illustration.
+        /// It is not actually used, because we have a public chat room where all users may join if they wish.
+        /// </summary>
+        /// <param name="typingText"></param>
+        /// <returns></returns>
+        public async Task TypingPublicAsync(string typingText)
+        {
+            try
+            {
+                await Clients.All.SendAsync(pushTyping, typingText);
+            }
+            catch (Exception e)
+            {
+                await LogError(e);
+            }
+        }
+
+        // SEND MESSAGE TO GROUP ASYNC
+        /// <summary>
+        /// Notifies users in a room that someone is typing 
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="typingText"></param>
+        /// <returns></returns>
+        public async Task TypingInRoomAsync(string groupName, string typingText)
+        {
+            try
+            {
+                string myUsername = Context.User.Identity.Name; // sender username
+                var sender = await this.userManager.FindByNameAsync(myUsername);
+                Console.WriteLine($"{myUsername} -> {groupName} -> {typingText}");
+                await Clients.OthersInGroup(groupName).SendAsync(pushTyping, typingText);
+            }
+            catch (Exception e)
+            {
+                await LogError(e);
+            }
+        }
+
+        // SEND PRIVATE MESSAGE ASYNC
+        /// <summary>
+        /// Notifies the other user in a private chat that you are typing 
+        /// </summary>
+        /// <param name="recipientUsername"></param>
+        /// <param name="typingText"></param>
+        /// <returns></returns>
+        public async Task TypingPrivateAsync(string recipientUsername, string typingText)
+        {
+            try
+            {
+                if (!connectionIds.ContainsKey(recipientUsername)) { return; }
+                await Clients.Client(connectionIds[recipientUsername]).SendAsync(pushTyping, typingText);
+            }
+            catch (Exception e)
+            {
+                await LogError(e);
+            }
+        }
+
+
+
 
 
 

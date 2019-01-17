@@ -18,6 +18,9 @@ const chatApp = (() => {
         sendPublicMessage: 'SendPublicMessageAsync',
         sendMessageToGroup: 'SendMessageToGroupAsync',
         sendPrivateMessage: 'SendPrivateMessageAsync',
+        hubTypingPublic: 'TypingPublicAsync',
+        hubTypingInRoom: 'TypingInRoomAsync',
+        hubTypingPrivate: 'TypingPrivateAsync',
 
         // client-side methods
         getData: "getData",
@@ -29,6 +32,7 @@ const chatApp = (() => {
         pushUsers: "pushUsers",
         pushMessages: "pushMessages",
         pushMessage: "pushMessage",
+        pushTyping: "pushTyping",
 
         // other constants
         publicRoomName: 'Public',
@@ -82,9 +86,10 @@ const chatApp = (() => {
         },
         userUsernamePropertyName: 'username',
         roomModelNamePropertyName: 'name',
+        typingCheckFrequency: 2000,
+        typingCheckThreshold: 3,
     }
-});
-
+})();
 
 
 // APP
@@ -97,12 +102,13 @@ class App extends React.Component {
         rooms: [], users: [], messages: [],
         activeRoom: null, lastActiveRoom: null,
         activeUser: null, lastActiveUser: null,
+        typingText: null,
     }
 
     componentDidMount() {
 
         const { connectionUrl, getData, youAre, notify, userOnline, userOffline,
-            pushRooms, pushUsers, pushMessages, pushMessage } = chatApp();
+            pushRooms, pushUsers, pushMessages, pushMessage, pushTyping } = chatApp;
 
         // set connection
         // LogLevel: Error=> errors only; Warning=> W+Errors; Information=>I+W+E; Trace=> everything, incl. the data
@@ -146,12 +152,13 @@ class App extends React.Component {
         this.connection.on(pushUsers, users => this.pushUsers(users));
         this.connection.on(pushMessages, messages => this.pushMessages(messages));
         this.connection.on(pushMessage, (user, messageText) => this.pushMessage(user, messageText));
+        this.connection.on(pushTyping, (typingText) => this.pushTyping(typingText));
     }
 
     // SET PAGE
     setPage = (page, room = null, user = null) => {
 
-        const { publicRoomName } = chatApp();
+        const { publicRoomName } = chatApp;
         const { rooms, activePage, activeRoom, lastActiveRoom, activeUser, lastActiveUser } = this.state;
 
         console.log(`${activePage} -> ${page}`);
@@ -185,7 +192,7 @@ class App extends React.Component {
                 break;
 
             case 'Users':
-                this.connection.invoke(chatApp().hubPushRoomMembers, room.name).catch(err => console.error(err.toString()));
+                this.connection.invoke(chatApp.hubPushRoomMembers, room.name).catch(err => console.error(err.toString()));
                 this.setState({
                     activePage: page,
                     activeRoom: room,
@@ -196,7 +203,7 @@ class App extends React.Component {
                 break;
 
             case 'AllUsers':
-                this.connection.invoke(chatApp().hubPushAllUsers).catch(err => console.error(err.toString()));
+                this.connection.invoke(chatApp.hubPushAllUsers).catch(err => console.error(err.toString()));
                 this.setState({
                     activePage: 'Users',
                     activeRoom: null,
@@ -219,7 +226,7 @@ class App extends React.Component {
                         activeUser: user,
                         lastActiveUser: (activeUser ? activeUser : lastActiveUser)
                     });
-                    this.connection.invoke(chatApp().hubPushUserMessages, user.username).catch(err => console.error(err.toString()));
+                    this.connection.invoke(chatApp.hubPushUserMessages, user.username).catch(err => console.error(err.toString()));
                 } else if (room) {
 
                     //console.log(room.name);
@@ -231,12 +238,12 @@ class App extends React.Component {
                         activeUser: null,
                         lastActiveUser: (activeUser ? activeUser : lastActiveUser)
                     });
-                    this.connection.invoke(chatApp().hubPushRoomMessages, room.name).catch(err => console.error(err.toString()));
+                    this.connection.invoke(chatApp.hubPushRoomMessages, room.name).catch(err => console.error(err.toString()));
                 } else {
                     let thePublicRoom = rooms.find(r => r.name == publicRoomName);
                     if (!thePublicRoom) { thePublicRoom = { name: publicRoomName }; }
                     this.setState({ activePage: page, activeRoom: thePublicRoom });
-                    this.connection.invoke(chatApp().hubPushRoomMessages, publicRoomName).catch(err => console.error(err.toString()));
+                    this.connection.invoke(chatApp.hubPushRoomMessages, publicRoomName).catch(err => console.error(err.toString()));
                 }
 
                 break;
@@ -247,13 +254,14 @@ class App extends React.Component {
 
 
     // GET DATA
-    getData = () => this.connection.invoke(chatApp().hubGetData).catch(err => console.error(err.toString()));
+    getData = () => this.connection.invoke(chatApp.hubGetData).catch(err => console.error(err.toString()));
 
     // YOU ARE
     youAre = (username) => this.setState({ youAre: username });
 
     // NOTIFY
     notify = (message) => { alert(message); };
+
 
 
     /////////////
@@ -265,7 +273,7 @@ class App extends React.Component {
         //console.log(rooms);
 
         // move the Public room to the top
-        const { publicRoomName, roomModelNamePropertyName } = chatApp();
+        const { publicRoomName, roomModelNamePropertyName } = chatApp;
         const publicRoom = roomModels.find(r => r.name === publicRoomName);
         roomModels = this.sortByProperty(roomModelNamePropertyName, roomModels.filter(r => r.name !== publicRoomName));
         // setState
@@ -273,13 +281,13 @@ class App extends React.Component {
     }
 
     // CREATE ROOM
-    createRoom = (roomName) => this.connection.invoke(chatApp().hubCreateRoom, roomName).catch(err => console.error(err.toString()));
+    createRoom = (roomName) => this.connection.invoke(chatApp.hubCreateRoom, roomName).catch(err => console.error(err.toString()));
 
     // JOIN ROOM
-    joinRoom = (roomName) => this.connection.invoke(chatApp().hubJoinRoom, roomName).catch(err => console.error(err.toString()));
+    joinRoom = (roomName) => this.connection.invoke(chatApp.hubJoinRoom, roomName).catch(err => console.error(err.toString()));
 
     // LEAVE ROOM
-    leaveRoom = (roomName) => this.connection.invoke(chatApp().hubLeaveRoom, roomName).catch(err => console.error(err.toString()));
+    leaveRoom = (roomName) => this.connection.invoke(chatApp.hubLeaveRoom, roomName).catch(err => console.error(err.toString()));
 
 
     /////////////
@@ -287,7 +295,7 @@ class App extends React.Component {
 
     // PUSH USERS
     pushUsers = (userModels) => {
-        const { userUsernamePropertyName } = chatApp();
+        const { userUsernamePropertyName } = chatApp;
         console.log('Users:' + userModels.length);
         //console.log(userModels);
         this.setState({ users: this.sortByProperty(userUsernamePropertyName, userModels) });
@@ -295,7 +303,7 @@ class App extends React.Component {
 
     // USER ONLINE
     userOnline = (userModel) => {
-        const { userUsernamePropertyName } = chatApp();
+        const { userUsernamePropertyName } = chatApp;
         //console.log(userModel);
         this.userOffline(userModel.username);
         const userModels = this.sortByProperty(userUsernamePropertyName, [...this.state.users, userModel]);
@@ -304,7 +312,7 @@ class App extends React.Component {
 
     // USER OFFLINE
     userOffline = (username) => {
-        const { userUsernamePropertyName } = chatApp();
+        const { userUsernamePropertyName } = chatApp;
         this.setState({ users: this.sortByProperty(userUsernamePropertyName, this.state.users.filter(user => user.username !== username)) });
     }
 
@@ -315,10 +323,37 @@ class App extends React.Component {
     // PUSH MESSAGES
     pushMessages = (messageModels) => this.setState({ messages: messageModels });
 
+    // PUSH MESSAGE
+    pushMessage = (messageModel) => {
+        console.log(messageModel);
+        const messageText = this.escapeHtml(messageModel.text);
+        this.setState({
+            messages: [...this.state.messages, {
+                id: messageModel.id,
+                text: messageText,
+                timeSent: messageModel.timeSent,
+                sender: messageModel.sender,
+            }]
+        })
+    }
+
+    escapeHtml = (unsafeText) => {
+        return unsafeText
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // PUSH TYPING
+    pushTyping = (typingText) => this.setState({ typingText: typingText });
+
+
     // SEND MESSAGE
     sendMessage = (messageText) => {
 
-        const { sendPublicMessage, sendMessageToGroup, sendPrivateMessage } = chatApp();
+        const { sendPublicMessage, sendMessageToGroup, sendPrivateMessage } = chatApp;
         const { activeRoom, activeUser } = this.state;
 
         if (activeUser) { // private message to another user
@@ -346,28 +381,22 @@ class App extends React.Component {
             .refs.messageInput.focus();
     }
 
+    // SEND TYPING
+    sendTyping = (isTyping) => {
+        const { hubTypingPrivate, hubTypingInRoom, hubTypingPublic } = chatApp;
+        const { youAre, activeRoom, activeUser } = this.state;
 
-    // PUSH MESSAGE
-    pushMessage = (messageModel) => {
-        console.log(messageModel);
-        const messageText = this.escapeHtml(messageModel.text);
-        this.setState({
-            messages: [...this.state.messages, {
-                id: messageModel.id,
-                text: messageText,
-                timeSent: messageModel.timeSent,
-                sender: messageModel.sender,
-            }]
-        })
-    }
-
-    escapeHtml = (unsafeText) => {
-        return unsafeText
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+        if (activeUser) { // while private messaging with another user
+            const typingText = isTyping ? `${youAre} is typing a message...` : '';
+            this.connection.invoke(hubTypingPrivate, activeUser.username, typingText).catch(err => console.error(err.toString()));
+        }
+        else if (activeRoom) { // while messaging in a room or in public
+            const typingText = isTyping ? 'Someone is typing a message...' : '';
+            this.connection.invoke(hubTypingInRoom, activeRoom.name, typingText).catch(err => console.error(err.toString()));
+        } else {
+            const typingText = isTyping ? 'Someone is typing a message...' : '';
+            this.connection.invoke(hubTypingPublic, typingText).catch(err => console.error(err.toString()));
+        }
     }
 
 
@@ -378,7 +407,7 @@ class App extends React.Component {
 
     // RENDER
     render() {
-        const { youAre, rooms, users, messages, activeRoom, lastActiveRoom, activeUser, lastActiveUser, activePage } = this.state;
+        const { youAre, rooms, users, messages, activeRoom, lastActiveRoom, activeUser, lastActiveUser, activePage, typingText } = this.state;
         return (
             <div className="row bg-light rounded border shadow h-100">
 
@@ -401,8 +430,9 @@ class App extends React.Component {
 
                 {(activePage == 'Chat') &&
                     <Messages
-                        messages={messages}
                         ref="messages"
+                        messages={messages}
+                        typingText={typingText}
                         youAre={youAre}
                         activeRoom={activeRoom}
                         activeRoom={activeRoom}
@@ -410,6 +440,7 @@ class App extends React.Component {
                         lastActiveRoom={lastActiveRoom}
                         lastActiveUser={lastActiveUser}
                         sendMessage={this.sendMessage}
+                        sendTyping={this.sendTyping}
                         setPage={this.setPage}
                     />}
 
@@ -618,7 +649,7 @@ class UsersList extends React.Component {
 // USER ITEM
 class UserItem extends React.Component {
     render() {
-        const { formatDate, formatTimeShort } = chatApp();
+        const { formatDate, formatTimeShort } = chatApp;
         const { user, setPage, } = this.props;
         const { username, isOnline, onlineAtUTC } = user;
         return (
@@ -649,7 +680,7 @@ class Messages extends React.Component {
 
     render() {
         const filter = { term: this.state.filterTerm, clear: this.filterClear, change: this.filterChange };
-        const { youAre, messages, sendMessage, activeRoom, lastActiveRoom, activeUser, setPage } = this.props;
+        const { youAre, messages, typingText, sendMessage, sendTyping, activeRoom, lastActiveRoom, activeUser, setPage } = this.props;
         const room = activeRoom ? activeRoom : lastActiveRoom;
         return (
             <div className="col h-100 bg-light border p-0">
@@ -659,6 +690,7 @@ class Messages extends React.Component {
                     <span data-tip="All Rooms"><ReactTooltip />
                         {<button className="btn btn-sm btn-primary float-left" onClick={() => setPage('Rooms', room)}><ArrowsLeft /> <IconRooms /></button>}
                     </span>
+
                     {/* Room / User */}
                     {activeRoom && <span data-tip="Room"><ReactTooltip /><button disabled className="btn btn-sm btn-primary"><IconRoom /> {room.name}</button></span>}
                     {activeUser && <span data-tip="User"><ReactTooltip /><button disabled className={`btn btn-sm btn-${activeUser.isOnline ? 'success' : 'danger'}`}><IconUser /> User: {activeUser.username}</button></span>}
@@ -669,8 +701,8 @@ class Messages extends React.Component {
 
                 </div>
 
-                <MessagesList messages={messages} filter={filter} youAre={youAre} />
-                <MessagesFooter ref="messagesFooter" sendMessage={sendMessage} filter={filter} />
+                <MessagesList messages={messages} filter={filter} youAre={youAre} typingText={typingText} />
+                <MessagesFooter ref="messagesFooter" sendMessage={sendMessage} sendTyping={sendTyping} filter={filter} />
             </div>
         )
     }
@@ -679,7 +711,7 @@ class Messages extends React.Component {
 // MESSAGES LIST
 class MessagesList extends React.Component {
     render() {
-        const { messages, filter, youAre } = this.props;
+        const { messages, filter, youAre, typingText } = this.props;
         const filteredMessages = messages.filter(m => m.text.toLowerCase().includes(filter.term.toLowerCase()));
         return (
             <div id="messagesList" className="p-2">
@@ -692,6 +724,9 @@ class MessagesList extends React.Component {
                     </div>}
                 {(filteredMessages.length == 0)
                     && <div className="text-center bg-warning p-3 mx-3 my-5 rounded shadow display-4">No Messages {filter.term ? <span><br />containing '{filter.term}'</span> : ''}</div>}
+
+
+                <div className="bg-info px-2 rounded "> {typingText}</div>
             </div>
         )
     }
@@ -701,7 +736,7 @@ class MessagesList extends React.Component {
 class MessageItem extends React.Component {
     render() {
         //console.log(this.props.msg);
-        const { userCircleSize, formatDate, formatTimeLong } = chatApp();
+        const { formatDate, formatTimeLong } = chatApp;
         const { youAre, msg } = this.props;
         const { sender, text, timeSent } = msg;
         const isYou = (sender.username === youAre);
@@ -721,7 +756,6 @@ class MessageItem extends React.Component {
     }
 }
 
-
 // MESSAGES FOOTER
 class MessagesFooter extends React.Component {
 
@@ -734,21 +768,24 @@ class MessagesFooter extends React.Component {
 
     render() {
         const { showFilter } = this.state;
-        const { sendMessage, filter } = this.props;
+        const { sendMessage, sendTyping, filter } = this.props;
         return (
             <div className="w-100 bg-dark border-top d-flex py-2">
                 <ToggleButton classes="btn btn btn-warning mx-1" onOff={showFilter} onClick={() => this.onToggle()} dataTip="Toggle Filter" />
-                {!showFilter ? <SendMessage ref="sendMessage" sendMessage={sendMessage} /> : <FilterMessages filter={filter} />}
+                {!showFilter ? <SendMessage ref="sendMessage" sendMessage={sendMessage} sendTyping={sendTyping} /> : <FilterMessages filter={filter} />}
             </div>
         )
     }
 }
 
-
 // SEND MESSAGE
 class SendMessage extends React.Component {
 
-    state = { message: '' }
+    state = {
+        message: '',
+        timerId: null,
+        changeCount: 0,
+    }
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -759,7 +796,30 @@ class SendMessage extends React.Component {
         }
     }
 
-    onChange = (e) => this.setState({ [e.target.name]: e.target.value });
+    onChange = (e) => {
+        const { typingCheckFrequency } = chatApp;
+        const { timerId, changeCount } = this.state;
+        this.setState({
+            [e.target.name]: e.target.value,
+            changeCount: changeCount + 1
+        });
+        if (!timerId) {
+            this.setState({ timerId: setTimeout(this.check, typingCheckFrequency) });
+        }
+    }
+    check = () => {
+        const { typingCheckFrequency, typingCheckThreshold } = chatApp;
+        const isTyping = (this.state.changeCount > typingCheckThreshold);
+
+        this.props.sendTyping(isTyping);
+        if (isTyping) {
+            this.setState({ timerId: setTimeout(this.check, typingCheckFrequency) });
+        }
+        this.setState({ timerId: null });
+        if (this.state.changeCount > 0) {
+            this.setState({ timerId: setTimeout(this.check, typingCheckFrequency), changeCount: 0 });
+        }
+    }
 
     componentDidUpdate() {
         const objDiv = document.getElementById("messagesList");
@@ -818,7 +878,7 @@ class FilterMessages extends React.Component {
 }
 
 
-const SetIconPublic = (roomName) => (roomName === chatApp().publicRoomName) && <IconPublic />;
+const SetIconPublic = (roomName) => (roomName === chatApp.publicRoomName) && <IconPublic />;
 const ArrowsLeft = () => <i className="fas fa-angle-double-left"></i>;
 const ArrowsRight = () => <i className="fas fa-angle-double-right"></i>;
 const IconRoom = () => <i className="fab fa-react"></i>;

@@ -1,6 +1,5 @@
 ﻿//import LikeButton from './components/LikeButton'
 
-
 const chatApp = (() => {
     return {
         // connection

@@ -493,7 +493,7 @@
             }
         }
 
-        // SEND MESSAGE TO GROUP ASYNC
+        // TYPING IN ROOM ASYNC
         /// <summary>
         /// Notifies users in a room that someone is typing 
         /// </summary>
@@ -515,7 +515,7 @@
             }
         }
 
-        // SEND PRIVATE MESSAGE ASYNC
+        // TYPING PRIVATE ASYNC
         /// <summary>
         /// Notifies the other user in a private chat that you are typing 
         /// </summary>
